@@ -9,6 +9,8 @@ import {
   PolarisProvider,
 } from "./components";
 
+import './assets/scss/app.scss';
+
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
   // See documentation for <Routes /> for more info
@@ -23,9 +25,17 @@ export default function App() {
             <NavigationMenu
               navigationLinks={[
                 {
-                  label: t("NavigationMenu.pageName"),
-                  destination: "/pagename",
+                    label: "Orders",
+                    destination: "/orders",
                 },
+                {
+                    label: "Shipping Rates",
+                    destination: "/shipping-rates"
+                },
+                {
+                    label: "Settings",
+                    destination: '/settings'
+                }
               ]}
             />
             <Routes pages={pages} />

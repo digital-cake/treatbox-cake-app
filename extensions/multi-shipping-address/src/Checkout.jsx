@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
     reactExtension,
@@ -24,7 +24,10 @@ import {
     Heading,
     Pressable,
     BlockSpacer,
-    Form
+    Form,
+    Disclosure,
+    List,
+    ListItem
 } from '@shopify/ui-extensions-react/checkout';
 
 import countryOptions from './countryOptions';
@@ -40,11 +43,14 @@ function Extension() {
     const {ui, query} = useApi();
 
     const cartLines = useCartLines();
+    const shippableCartLines  = cartLines.filter(line => line.merchandise.requiresShipping);
 
     const [shippingCountries, setShippingCountries] = useState([]);
     const [additionalAddressEdit, setAdditionalAddressEdit] = useState({});
     const [addressSaving, setAddressSaving] = useState(false);
+    const [addressDeleting, setAddressDeleting] = useState(false);
     const [additionalAddresses, setAdditionalAddresses] = useState([]);
+    const [openDisclosures, setOpenDisclosures] =  useState([]);
 
     const attributes = useAttributes();
     const applyAttributeChange = useApplyAttributeChange();
@@ -80,6 +86,17 @@ function Extension() {
 
             try {
                 const addresses = JSON.parse(attributes[i].value);
+
+                for (let j = 0; j < addresses.length; j++) {
+                    const newItems = [];
+                    for (let k = 0; k < addresses[j].items.length; k++) {
+                        const index = shippableCartLines.findIndex(item => item.id == addresses[j].items[k]);
+                        if (index === -1) continue;
+                        newItems.push(addresses[j].items[k]);
+                    }
+                    addresses[j].items = newItems;
+                }
+
                 setAdditionalAddresses(addresses);
             } catch(err) {
                 console.error(err.message);
@@ -88,12 +105,6 @@ function Extension() {
         }
 
     }, [attributes]);
-
-    useEffect(() => {
-
-        console.log(additionalAddresses);
-
-    }, [additionalAddresses]);
 
     useBuyerJourneyIntercept(({ canBlockProgress }) => {
         if (canBlockProgress) {
@@ -112,8 +123,6 @@ function Extension() {
             behavior: 'allow',
         };
     })
-
-    if (cartLines.length < 2) return null;
 
     function addressToString(address, delimiter) {
 
@@ -139,18 +148,27 @@ function Extension() {
 
         setAddressSaving(true);
 
+        const newAdditialAddresses = [ ...additionalAddresses ];
+
         const additionalAddress = { ...address };
 
         additionalAddress.key = addressToString(additionalAddress, '-').toLowerCase();
 
-        const duplicateAddressIndex = additionalAddresses.findIndex(addr => addr.key == additionalAddress.key);
+        let currentAddressIndex = newAdditialAddresses.findIndex(addr => addr.id == additionalAddress.id);
 
-        const newAdditialAddresses = [ ...additionalAddresses ];
+        let isNewAddress = currentAddressIndex === -1;
 
-        if (duplicateAddressIndex === -1) {
+        if (isNewAddress) {
+            const duplicateAddressIndex = newAdditialAddresses.findIndex(addr => addr.key == additionalAddress.key);
+            if (duplicateAddressIndex !== -1) {
+                newAdditialAddresses.splice(duplicateAddressIndex, 1);
+            }
+        }
+
+        if (isNewAddress) {
             newAdditialAddresses.push(additionalAddress);
         } else {
-            newAdditialAddresses[duplicateAddressIndex] = additionalAddress;
+            newAdditialAddresses[currentAddressIndex] = additionalAddress;
         }
 
         await applyAttributeChange({
@@ -159,12 +177,39 @@ function Extension() {
             value: JSON.stringify(newAdditialAddresses)
         });
 
+        if (isNewAddress) {
+            ui.overlay.close('AddressCreateModal');
+        } else {
+            ui.overlay.close(`AddressEditModal_${additionalAddress.id}`);
+        }
+
         setAddressSaving(false);
         setAdditionalAddresses(newAdditialAddresses);
-
-        ui.overlay.close('AdditionalAddressModal')
-
     };
+
+    async function onDeleteAddress(addressId) {
+        let currentAddressIndex = additionalAddresses.findIndex(addr => addr.id == addressId);
+
+        if (currentAddressIndex == -1) {
+            return;
+        }
+
+        setAddressDeleting(true);
+
+        const newAdditialAddresses = [ ...additionalAddresses ];
+        newAdditialAddresses.splice(currentAddressIndex, 1);
+
+        await applyAttributeChange({
+            type: 'updateAttribute',
+            key: '__additional_addresses',
+            value: JSON.stringify(newAdditialAddresses)
+        });
+
+        ui.overlay.close(`AddressEditModal_${addressId}`);
+
+        setAddressDeleting(false);
+        setAdditionalAddresses(newAdditialAddresses);
+    }
 
     function onAddAdditionalAddressClick() {
         setAdditionalAddressEdit({
@@ -182,21 +227,76 @@ function Extension() {
         })
     }
 
-    const additionalAddressModal = (
+    if (shippableCartLines.length < 2) return null;
+
+    const additionalAddressCreateModal = (
        <AddressEditModal
+            id="AddressCreateModal"
             initialAddress={additionalAddressEdit}
             onSave={onSaveAddress}
             saving={addressSaving}
-            cartLines={cartLines}
+            cartLines={shippableCartLines}
+            otherAddresses={additionalAddresses}
             countryOptions={countryOptions.filter(opt => shippingCountries.includes(opt.value))}
             />
     );
 
-
+    const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
+    const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
 
     return (
 
     <BlockStack spacing="base">
+
+        {
+             addressAssignedCartLines.length == shippableCartLines.length && (
+                <Banner status="warning">
+                    No items will be sent to this address
+                </Banner>
+             )
+        }
+
+        {
+            additionalAddresses.length > 0 && primaryAddressLineItems.length > 0 && (
+                <BlockLayout rows="auto"
+                            inlineAlignment="start"
+                            spacing="base">
+                    <Disclosure onToggle={setOpenDisclosures}
+                                spacing="base">
+                        <Pressable toggles={`selected-items-primary`}
+                                    kind="plain">
+
+                                <InlineLayout blockAlignment={'center'} spacing="extraTight">
+                                    <Text size='small'
+                                        appearance='accent'>
+                                        {openDisclosures.includes(`selected-items-primary`) ? 'Hide ' : 'Show ' }
+                                        {primaryAddressLineItems.length} item{primaryAddressLineItems.length != 1 ? 's' : ''}
+                                    </Text>
+
+                                    <Icon source={openDisclosures.includes(`selected-items-primary`) ? 'chevronUp' : 'chevronDown'}
+                                        size='extraSmall'
+                                        appearance='accent' />
+                                </InlineLayout>
+
+                        </Pressable>
+                        <View id={`selected-items-primary`}>
+                            <List spacing="base">
+                                {
+                                    shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id)).map(lineItem => {
+                                        return (
+                                            <ListItem key={lineItem.id}>
+                                                <Text size="small">{lineItem.merchandise.title}</Text>
+                                            </ListItem>
+                                        )
+                                    })
+                                }
+                            </List>
+                        </View>
+                    </Disclosure>
+                </BlockLayout>
+            )
+        }
+
         <BlockSpacer />
 
         <View>
@@ -205,25 +305,101 @@ function Extension() {
 
         {
             additionalAddresses.map(addr => (
-                <Pressable key={addr.key}>
-                    <View border="base"
-                          padding="base"
-                          cornerRadius="base">
-                        {addressToString(addr)}
-                    </View>
+                <BlockLayout
+                    rows="auto"
+                    inlineAlignment="start"
+                    border="base"
+                    padding="base"
+                    spacing="tight"
+                    cornerRadius="base"
+                    key={addr.id}>
 
-                </Pressable>
+                    <Pressable
+                          overlay={(
+                            <AddressEditModal
+                            id={`AddressEditModal_${addr.id}`}
+                            initialAddress={addr}
+                            onSave={onSaveAddress}
+                            onDelete={() => onDeleteAddress(addr.id)}
+                            saving={addressSaving}
+                            cartLines={shippableCartLines}
+                            deleting={addressDeleting}
+                            otherAddresses={additionalAddresses.filter(additional => additional.id != addr.id)}
+                            countryOptions={countryOptions.filter(opt => shippingCountries.includes(opt.value))}
+                            />
+                        )}>
+
+                        {addressToString(addr)}
+
+
+                    </Pressable>
+
+                    {
+                        addr.items.length > 0 && (
+                            <Disclosure onToggle={setOpenDisclosures}
+                            spacing="base">
+                                <Pressable toggles={`selected-items-${addr.id}`}
+                                            kind="plain">
+
+                                        <InlineLayout blockAlignment={'center'} spacing="extraTight">
+                                            <Text size='small'
+                                                appearance='accent'>
+                                                {openDisclosures.includes(`selected-items-${addr.id}`) ? 'Hide ' : 'Show ' }
+                                                {addr.items.length} item{addr.items.length != 1 ? 's' : ''}
+                                            </Text>
+
+                                            <Icon source={openDisclosures.includes(`selected-items-${addr.id}`) ? 'chevronUp' : 'chevronDown'}
+                                                size='extraSmall'
+                                                appearance='accent' />
+                                        </InlineLayout>
+
+                                </Pressable>
+                                <View id={`selected-items-${addr.id}`}>
+                                    <List spacing="base">
+                                        {
+                                            addr.items.map(itemId => {
+
+                                                const lineItem = shippableCartLines.find(line => line.id == itemId);
+
+                                                if (!lineItem) return null;
+
+                                                return (
+                                                    <ListItem key={itemId}>
+                                                        <Text size="small">{lineItem.merchandise.title}</Text>
+                                                    </ListItem>
+                                                )
+                                            })
+                                        }
+                                    </List>
+                                </View>
+                            </Disclosure>
+                        )
+                    }
+
+
+
+
+                </BlockLayout>
             ))
         }
 
-        <Button kind="secondary"
+        {
+            addressAssignedCartLines.length < shippableCartLines.length ? (
+                <Button kind="secondary"
                 onPress={onAddAdditionalAddressClick}
-                overlay={additionalAddressModal}>
-            <InlineStack blockAlignment="center">
-                <Icon source="plus" />
-                <Text>Add shipping address</Text>
-            </InlineStack>
-        </Button>
+                overlay={additionalAddressCreateModal}>
+                    <InlineStack blockAlignment="center">
+                        <Icon source="plus" />
+                        <Text>Add shipping address</Text>
+                    </InlineStack>
+                </Button>
+            ) : (
+                <Banner>
+                    <Text>All order items have been assigned to an additional address</Text>
+                </Banner>
+            )
+        }
+
 
     </BlockStack>
 

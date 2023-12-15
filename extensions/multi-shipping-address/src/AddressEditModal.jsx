@@ -8,12 +8,32 @@ import {
     TextField,
     InlineLayout,
     BlockLayout,
-    Form
+    Form,
+    Heading,
+    Text,
+    View,
+    BlockSpacer,
+    Pressable,
+    ProductThumbnail,
+    BlockStack,
+    Checkbox
 } from '@shopify/ui-extensions-react/checkout';
 
-export default function AddressEditModal({ onSave, initialAddress, countryOptions, saving }) {
+export default function AddressEditModal(props) {
 
-    const [address, setAddress] = useState({});
+    const {
+        id,
+        onSave,
+        initialAddress,
+        countryOptions,
+        saving,
+        cartLines,
+         deleting,
+         onDelete,
+         otherAddresses
+    } = props;
+
+    const [address, setAddress] = useState(null);
     const [fieldErrors, setFieldErrors] = useState({});
 
     useEffect(() => {
@@ -22,7 +42,7 @@ export default function AddressEditModal({ onSave, initialAddress, countryOption
 
     useEffect(() => {
         setFieldErrors({});
-    }, [address.firstName, address.lastName, address.address1, address.city, address.zip, address.country]);
+    }, [address?.firstName, address?.lastName, address?.address1, address?.city, address?.zip, address?.country]);
 
     function onCountryCodeChange(value) {
         setAddress(addr => ({ ...addr, countryCode: value }));
@@ -53,13 +73,44 @@ export default function AddressEditModal({ onSave, initialAddress, countryOption
         onSave(address);
     }
 
+    function onLineItemPress(lineId) {
+
+        const items = Array.isArray(address.items) ? [ ...address.items ] : [];
+
+        const index = items.indexOf(lineId);
+
+        if (index === -1) {
+            items.push(lineId);
+        } else {
+            items.splice(index, 1);
+        }
+
+        setAddress(addr => ({
+            ...addr,
+            items: items
+        }));
+    }
+
+    function lineItemAssignedToOtherAddress(lineId) {
+        for (let i = 0; i < otherAddresses.length; i++) {
+            if (!otherAddresses[i].items.includes(lineId)) continue;
+            return true;
+        }
+
+        return false;
+    }
+
+    if (!address) return null;
+
     return (
-        <Modal id="AdditionalAddressModal"
+        <Modal id={id}
             padding
-            title={address.address1 ? address.address1 : "New address"}>
+            onOpen={() => setAddress(initialAddress)}
+            title={address.key ? "Edit Address" : "Add address"}>
 
             <Form onSubmit={onAddressSubmit}>
-                <BlockLayout spacing="base">
+                <BlockLayout spacing="base"
+                             rows="auto">
                     <Select label="Country/Region"
                         options={countryOptions}
                         value={address.countryCode}
@@ -101,12 +152,75 @@ export default function AddressEditModal({ onSave, initialAddress, countryOption
                                     error={fieldErrors.zip}  />
                     </InlineLayout>
 
-                    <InlineStack blockAlignment="center"
-                                inlineAlignment="end">
-                        <Button loading={saving}
-                                accessibilityRole="submit"
-                                >Add address</Button>
-                    </InlineStack>
+                    <BlockSpacer spacing="tight" />
+
+                    <View>
+                        <BlockStack>
+                            <Heading>Shipping Items</Heading>
+                            <Text>Select the items you would like to send to this address</Text>
+                            <BlockStack spacing="tight">
+                                {
+                                    cartLines.map(line => {
+
+                                        if (lineItemAssignedToOtherAddress(line.id)) return null;
+
+                                        return (
+                                            <Pressable  border="base"
+                                                        cornerRadius="base"
+                                                        padding="base"
+                                                        key={line.id}
+                                                        onPress={() => onLineItemPress(line.id)}>
+                                                <InlineLayout columns={['80%', 'fill']}
+                                                            blockAlignment="center"
+                                                            spacing="base">
+
+                                                    <InlineStack spacing="base"
+                                                                columns="auto"
+                                                                blockAlignment="center">
+                                                        <ProductThumbnail source={line.merchandise.image.url} opacity />
+                                                        <Text key={line.id}>{line.merchandise.title}</Text>
+                                                    </InlineStack>
+
+                                                    <View inlineAlignment="end">
+                                                        <Checkbox checked={address?.items?.includes(line.id)}
+                                                                  onChange={() => onLineItemPress(line.id)} />
+                                                    </View>
+
+
+                                                </InlineLayout>
+
+                                            </Pressable>
+                                        )
+
+                                    })
+                                }
+                            </BlockStack>
+                        </BlockStack>
+                    </View>
+
+
+                    <InlineLayout blockAlignment="center">
+                        {
+                            address.key && (
+                                <View>
+                                    <Button accessibilityRole="button"
+                                            kind="plain"
+                                            loading={deleting}
+                                            appearance='critical'
+                                            onPress={onDelete}>
+                                        Delete
+                                    </Button>
+                                </View>
+                            )
+                        }
+
+                        <View inlineAlignment="end">
+                            <Button loading={saving}
+                                    accessibilityRole="submit">
+                                { !address.key ? 'Add address' : 'Save address' }
+                            </Button>
+                        </View>
+                    </InlineLayout>
 
 
                 </BlockLayout>

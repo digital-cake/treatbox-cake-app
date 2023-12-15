@@ -18,6 +18,7 @@ use Shopify\Exception\InvalidWebhookException;
 use Shopify\Utils;
 use Shopify\Webhooks\Registry;
 use Shopify\Webhooks\Topics;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -125,6 +126,11 @@ Route::get('/api/products/create', function (Request $request) {
         return response()->json(["success" => $success, "error" => $error], $code);
     }
 })->middleware('shopify.auth');
+
+Route::controller(SettingsController::class)->group(function() {
+    Route::get('/api/settings', 'all');
+    Route::post('/api/settings', 'save');
+});
 
 Route::post('/api/webhooks', function (Request $request) {
     try {

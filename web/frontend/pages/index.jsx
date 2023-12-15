@@ -1,93 +1,113 @@
 import {
-  Card,
-  Page,
-  Layout,
-  TextContainer,
-  Image,
-  Stack,
-  Link,
-  Text,
+    AlphaCard,
+    Page,
+    Layout,
+    Text,
+    Link,
+    VerticalStack,
+    Icon,
+    ResourceList,
+    ResourceItem,
+    TextField,
+    Spinner
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
-import { useTranslation, Trans } from "react-i18next";
 
-import { trophyImage } from "../assets";
+import {
+    ShipmentMajor,
+    OrdersMajor,
+    ToolsMajor
+} from '@shopify/polaris-icons';
 
-import { ProductsCard } from "../components";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { getSessionToken } from "@shopify/app-bridge/utilities";
+
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
-  const { t } = useTranslation();
-  return (
-    <Page narrowWidth>
-      <TitleBar title={t("HomePage.title")} primaryAction={null} />
-      <Layout>
-        <Layout.Section>
-          <Card sectioned>
-            <Stack
-              wrap={false}
-              spacing="extraTight"
-              distribution="trailing"
-              alignment="center"
-            >
-              <Stack.Item fill>
-                <TextContainer spacing="loose">
-                  <Text as="h2" variant="headingMd">
-                    {t("HomePage.heading")}
+
+    const app = useAppBridge();
+
+    const resourceListItems = [
+        {
+            id: 'orders',
+            url: '/orders',
+            name: "Orders",
+            description: 'View orders and their Click & Drop sync status',
+            icon: (
+                <Icon source={OrdersMajor}
+                    tone="base"
+                />
+            )
+        },
+        {
+            id: 'shipping_rates',
+            url: '/shipping-rates',
+            name: "Shipping Rates",
+            description: 'Configure custom shipping rates displayed in your checkout',
+            icon: (
+                <Icon source={ShipmentMajor}
+                    tone="base"
+                />
+            )
+        },
+        {
+            id: 'settings',
+            url: '/settings',
+            name: "Settings",
+            description: 'Configure services and API access',
+            icon: (
+                <Icon source={ToolsMajor}
+                    tone="base"
+                />
+            )
+        }
+    ];
+
+    const renderMenuItem = (item) => {
+        const {id, url, name, description, icon} = item;
+
+        return (
+          <ResourceItem
+            id={id}
+            url={url}
+            media={icon}
+          >
+            <Text variant="bodyMd" fontWeight="bold" as="h3">
+              {name}
+            </Text>
+            <div>{description}</div>
+          </ResourceItem>
+        );
+    };
+
+    return (
+      <Page narrowWidth>
+        <Layout>
+          <Layout.Section>
+            <VerticalStack gap="5">
+                    <Text variant="headingMd" as="h3">
+                        Treatbox Custom App
+                    </Text>
+                    <AlphaCard padding={0}>
+                        <ResourceList
+                            resourceName={{ singular: 'menu item', plural: 'menu items' }}
+                            items={resourceListItems}
+                            renderItem={renderMenuItem}
+                        />
+                    </AlphaCard>
+                </VerticalStack>
+          </Layout.Section>
+          <Layout.Section>
+              <VerticalStack inlineAlign="center"  gap="5">
+                  <Text variant="bodyMd">
+                      Need help? Contact us at <Link url="mailto:dev@cake.agency">dev@cake.agency</Link>
                   </Text>
-                  <p>
-                    <Trans
-                      i18nKey="HomePage.yourAppIsReadyToExplore"
-                      components={{
-                        PolarisLink: (
-                          <Link url="https://polaris.shopify.com/" external />
-                        ),
-                        AdminApiLink: (
-                          <Link
-                            url="https://shopify.dev/api/admin-graphql"
-                            external
-                          />
-                        ),
-                        AppBridgeLink: (
-                          <Link
-                            url="https://shopify.dev/apps/tools/app-bridge"
-                            external
-                          />
-                        ),
-                      }}
-                    />
-                  </p>
-                  <p>{t("HomePage.startPopulatingYourApp")}</p>
-                  <p>
-                    <Trans
-                      i18nKey="HomePage.learnMore"
-                      components={{
-                        ShopifyTutorialLink: (
-                          <Link
-                            url="https://shopify.dev/apps/getting-started/add-functionality"
-                            external
-                          />
-                        ),
-                      }}
-                    />
-                  </p>
-                </TextContainer>
-              </Stack.Item>
-              <Stack.Item>
-                <div style={{ padding: "0 20px" }}>
-                  <Image
-                    source={trophyImage}
-                    alt={t("HomePage.trophyAltText")}
-                    width={120}
-                  />
-                </div>
-              </Stack.Item>
-            </Stack>
-          </Card>
-        </Layout.Section>
-        <Layout.Section>
-          <ProductsCard />
-        </Layout.Section>
-      </Layout>
-    </Page>
-  );
-}
+                  <Link url="https://www.cake.agency/" external>
+                      <img src="https://uploads-ssl.webflow.com/626153d62a08cb002a8ce41c/6398acd961aa3e264a4c30c0_Cake%20Full%20Logo%20Black-p-500.png" style={{ maxWidth: 80 }} />
+                  </Link>
+              </VerticalStack>
+          </Layout.Section>
+        </Layout>
+      </Page>
+    );
+  }
