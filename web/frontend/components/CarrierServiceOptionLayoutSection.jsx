@@ -6,7 +6,8 @@ import {
     Box,
     Spinner,
     Button,
-    Banner
+    Banner,
+    AlphaCard
 } from "@shopify/polaris";
 
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -131,7 +132,7 @@ export default function CarrierServiceOptionLayoutSection({ displayToast}) {
                     title="Our carrier service is active"
                     status="success">
                     <p>
-                        Customers will be presented with the relavant shipping options configured within this app within the your shop's checkout
+                        Customers will be presented with the relavant shipping options configured within this app on your shop's checkout
                     </p>
                 </Banner>
                 <Text>Activated on: { moment(activeCarrierService.created_at).format('DD/MM/YYYY HH:mm') }</Text>
@@ -159,7 +160,7 @@ export default function CarrierServiceOptionLayoutSection({ displayToast}) {
 
             </Layout.Section>
             <Layout.Section>
-                <Card>
+                <AlphaCard>
                     {
                         carrierServiceOptionLoading && (
                             <div className="card-loader-wrapper">
@@ -170,7 +171,7 @@ export default function CarrierServiceOptionLayoutSection({ displayToast}) {
                     {
                         renderCarrierServiceOptionConfig()
                     }
-                </Card>
+                </AlphaCard>
             </Layout.Section>
         </>
     )

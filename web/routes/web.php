@@ -19,6 +19,7 @@ use Shopify\Utils;
 use Shopify\Webhooks\Registry;
 use Shopify\Webhooks\Topics;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ActiveCarrierServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -130,6 +131,11 @@ Route::get('/api/products/create', function (Request $request) {
 Route::controller(SettingsController::class)->group(function() {
     Route::get('/api/settings', 'all');
     Route::post('/api/settings', 'save');
+});
+
+Route::controller(ActiveCarrierServiceController::class)->group(function() {
+    Route::get('/api/active-carrier-service', 'get');
+    Route::put('/api/active-carrier-service', 'toggle');
 });
 
 Route::post('/api/webhooks', function (Request $request) {
