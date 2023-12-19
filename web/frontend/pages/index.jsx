@@ -9,7 +9,8 @@ import {
     ResourceList,
     ResourceItem,
     TextField,
-    Spinner
+    Spinner,
+    Button
 } from "@shopify/polaris";
 
 import {
@@ -96,17 +97,17 @@ export default function HomePage() {
                         />
                     </AlphaCard>
                 </VerticalStack>
-          </Layout.Section>
-          <Layout.Section>
-              <VerticalStack inlineAlign="center"  gap="5">
+            </Layout.Section>
+            <Layout.Section>
+                <VerticalStack inlineAlign="center"  gap="5">
                   <Text variant="bodyMd">
                       Need help? Contact us at <Link url="mailto:dev@cake.agency">dev@cake.agency</Link>
                   </Text>
                   <Link url="https://www.cake.agency/" external>
                       <img src="https://uploads-ssl.webflow.com/626153d62a08cb002a8ce41c/6398acd961aa3e264a4c30c0_Cake%20Full%20Logo%20Black-p-500.png" style={{ maxWidth: 80 }} />
                   </Link>
-              </VerticalStack>
-          </Layout.Section>
+                </VerticalStack>
+            </Layout.Section>
         </Layout>
       </Page>
     );

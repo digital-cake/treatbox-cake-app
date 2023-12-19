@@ -20,6 +20,7 @@ use Shopify\Webhooks\Registry;
 use Shopify\Webhooks\Topics;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ActiveCarrierServiceController;
+use App\Http\Controllers\ShippingRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -136,6 +137,13 @@ Route::controller(SettingsController::class)->group(function() {
 Route::controller(ActiveCarrierServiceController::class)->group(function() {
     Route::get('/api/active-carrier-service', 'get');
     Route::put('/api/active-carrier-service', 'toggle');
+});
+
+Route::controller(ShippingRateController::class)->group(function() {
+    Route::get('/api/shipping-rates', 'list');
+    Route::get('/api/shipping-rates/{id}', 'get');
+    Route::post('/api/shipping-rates/{id}', 'save');
+    Route::delete('/api/shipping-rates/{id}', 'delete');
 });
 
 Route::post('/api/webhooks', function (Request $request) {
