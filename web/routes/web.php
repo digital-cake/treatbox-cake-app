@@ -21,6 +21,7 @@ use Shopify\Webhooks\Topics;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ActiveCarrierServiceController;
 use App\Http\Controllers\ShippingRateController;
+use App\Http\Controllers\ShopifyCarrierServiceCallbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -144,6 +145,10 @@ Route::controller(ShippingRateController::class)->group(function() {
     Route::get('/api/shipping-rates/{id}', 'get');
     Route::post('/api/shipping-rates/{id}', 'save');
     Route::delete('/api/shipping-rates/{id}', 'delete');
+});
+
+Route::controller(ShopifyCarrierServiceCallbackController::class)->group(function() {
+    Route::post('/api/carrier-service/callback', 'handle');
 });
 
 Route::post('/api/webhooks', function (Request $request) {

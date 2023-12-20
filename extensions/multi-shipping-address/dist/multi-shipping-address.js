@@ -1133,7 +1133,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState4(initialState) {
+          function useState5(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1145,7 +1145,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect5(create, deps) {
+          function useEffect6(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1927,7 +1927,7 @@
           exports.useContext = useContext3;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect5;
+          exports.useEffect = useEffect6;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -1935,7 +1935,7 @@
           exports.useMemo = useMemo3;
           exports.useReducer = useReducer;
           exports.useRef = useRef3;
-          exports.useState = useState4;
+          exports.useState = useState5;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -18401,11 +18401,11 @@
               return jsxWithValidation(type, props, key, false);
             }
           }
-          var jsx6 = jsxWithValidationDynamic;
-          var jsxs3 = jsxWithValidationStatic;
+          var jsx7 = jsxWithValidationDynamic;
+          var jsxs4 = jsxWithValidationStatic;
           exports.Fragment = REACT_FRAGMENT_TYPE;
-          exports.jsx = jsx6;
-          exports.jsxs = jsxs3;
+          exports.jsx = jsx7;
+          exports.jsxs = jsxs4;
         })();
       }
     }
@@ -18424,7 +18424,7 @@
   });
 
   // extensions/multi-shipping-address/src/Checkout.jsx
-  var import_react33 = __toESM(require_react());
+  var import_react37 = __toESM(require_react());
 
   // node_modules/@remote-ui/rpc/build/esm/memory.mjs
   function isBasicObject(value) {
@@ -19142,8 +19142,17 @@
   // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Checkbox/Checkbox.mjs
   var Checkbox = createRemoteComponent("Checkbox");
 
+  // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Choice/Choice.mjs
+  var Choice = createRemoteComponent("Choice");
+
+  // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/ChoiceList/ChoiceList.mjs
+  var ChoiceList = createRemoteComponent("ChoiceList");
+
   // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Disclosure/Disclosure.mjs
   var Disclosure = createRemoteComponent("Disclosure");
+
+  // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Divider/Divider.mjs
+  var Divider = createRemoteComponent("Divider");
 
   // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Form/Form.mjs
   var Form = createRemoteComponent("Form");
@@ -19177,6 +19186,9 @@
 
   // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Select/Select.mjs
   var Select = createRemoteComponent("Select");
+
+  // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Spinner/Spinner.mjs
+  var Spinner = createRemoteComponent("Spinner");
 
   // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Text/Text.mjs
   var Text = createRemoteComponent("Text");
@@ -19535,8 +19547,14 @@ ${errorInfo.componentStack}`);
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Checkbox/Checkbox.mjs
   var Checkbox2 = createRemoteReactComponent(Checkbox);
 
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Choice/Choice.mjs
+  var Choice2 = createRemoteReactComponent(Choice);
+
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Disclosure/Disclosure.mjs
   var Disclosure2 = createRemoteReactComponent(Disclosure);
+
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Divider/Divider.mjs
+  var Divider2 = createRemoteReactComponent(Divider);
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Form/Form.mjs
   var Form2 = createRemoteReactComponent(Form);
@@ -19573,6 +19591,9 @@ ${errorInfo.componentStack}`);
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Select/Select.mjs
   var Select2 = createRemoteReactComponent(Select);
 
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Spinner/Spinner.mjs
+  var Spinner2 = createRemoteReactComponent(Spinner);
+
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Text/Text.mjs
   var Text2 = createRemoteReactComponent(Text);
 
@@ -19585,7 +19606,7 @@ ${errorInfo.componentStack}`);
   var View2 = createRemoteReactComponent(View);
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
-  var import_react29 = __toESM(require_react(), 1);
+  var import_react32 = __toESM(require_react(), 1);
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/errors.mjs
   var CheckoutUIExtensionError = class extends Error {
@@ -19603,7 +19624,7 @@ ${errorInfo.componentStack}`);
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
   function useApi(_target) {
-    const api = (0, import_react29.useContext)(ExtensionApiContext);
+    const api = (0, import_react32.useContext)(ExtensionApiContext);
     if (api == null) {
       throw new CheckoutUIExtensionError("You can only call this hook when running as a UI extension.");
     }
@@ -19611,10 +19632,10 @@ ${errorInfo.componentStack}`);
   }
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/subscription.mjs
-  var import_react30 = __toESM(require_react(), 1);
+  var import_react33 = __toESM(require_react(), 1);
   function useSubscription(subscription) {
-    const [, setValue] = (0, import_react30.useState)(subscription.current);
-    (0, import_react30.useEffect)(() => {
+    const [, setValue] = (0, import_react33.useState)(subscription.current);
+    (0, import_react33.useEffect)(() => {
       let didUnsubscribe = false;
       const checkForUpdates = (newValue) => {
         if (didUnsubscribe) {
@@ -19633,15 +19654,15 @@ ${errorInfo.componentStack}`);
   }
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/buyer-journey.mjs
-  var import_react31 = __toESM(require_react(), 1);
+  var import_react34 = __toESM(require_react(), 1);
   function useBuyerJourneyIntercept(interceptor) {
     const api = useApi();
     if (!("buyerJourney" in api)) {
       throw new ExtensionHasNoMethodError("buyerJourney", api.extension.target);
     }
-    const interceptorRef = (0, import_react31.useRef)(interceptor);
+    const interceptorRef = (0, import_react34.useRef)(interceptor);
     interceptorRef.current = interceptor;
-    return (0, import_react31.useEffect)(() => {
+    return (0, import_react34.useEffect)(() => {
       const teardownPromise = api.buyerJourney.intercept((interceptorProps) => interceptorRef.current(interceptorProps));
       return () => {
         teardownPromise.then((teardown) => teardown()).catch(() => {
@@ -19668,6 +19689,13 @@ ${errorInfo.componentStack}`);
       lines
     } = useApi();
     return useSubscription(lines);
+  }
+  function useApplyCartLinesChange() {
+    const api = useApi();
+    if ("applyCartLinesChange" in api) {
+      return api.applyCartLinesChange;
+    }
+    throw new ExtensionHasNoMethodError("applyCartLinesChange", api.extension.target);
   }
 
   // extensions/multi-shipping-address/src/countryOptions.js
@@ -20675,8 +20703,80 @@ ${errorInfo.componentStack}`);
   ];
 
   // extensions/multi-shipping-address/src/AddressEditModal.jsx
-  var import_react32 = __toESM(require_react());
+  var import_react36 = __toESM(require_react());
+
+  // extensions/multi-shipping-address/src/DeliveryMethodSelection.jsx
+  var import_react35 = __toESM(require_react());
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+  function DeliveryMethodSelection({ countryCode, shop, onChange, selected }) {
+    const [rates, setRates] = (0, import_react35.useState)([]);
+    const [loading, setLoading] = (0, import_react35.useState)(false);
+    (0, import_react35.useEffect)(() => {
+      setLoading(true);
+      fetch(`https://d8fc-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
+        setRates(response.rates);
+        setLoading(false);
+      }).catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+    }, [countryCode, shop]);
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "base", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Heading2, { level: "2", children: "Shipping method" }),
+      loading && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner2, {}),
+      !loading && rates.length < 1 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "No shipping rates available" }),
+      !loading && rates.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        ChoiceList,
+        {
+          name: "shipping_method",
+          value: selected,
+          onChange,
+          children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            BlockStack2,
+            {
+              spacing: "none",
+              cornerRadius: "base",
+              border: "base",
+              children: rates.map((rate, index) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+                Pressable2,
+                {
+                  onPress: () => onChange(rate.id.toString()),
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+                      InlineLayout2,
+                      {
+                        spacing: "base",
+                        blockAlignment: "center",
+                        columns: ["auto", "fill", "auto"],
+                        padding: "base",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Choice2, { id: rate.id.toString() }),
+                          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "extraTight", children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: rate.name }),
+                            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { appearance: "subdued", children: rate.description })
+                          ] }),
+                          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { children: rate.base_rate == 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Free" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Text2, { children: [
+                            "\xA3",
+                            rate.base_rate
+                          ] }) })
+                        ]
+                      }
+                    ),
+                    index + 1 < rates.length && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Divider2, {})
+                  ]
+                },
+                `rate-${rate.id}`
+              ))
+            }
+          )
+        }
+      )
+    ] });
+  }
+
+  // extensions/multi-shipping-address/src/AddressEditModal.jsx
+  var import_jsx_runtime5 = __toESM(require_jsx_runtime());
   function AddressEditModal(props) {
     const {
       id,
@@ -20687,14 +20787,15 @@ ${errorInfo.componentStack}`);
       cartLines,
       deleting,
       onDelete,
-      otherAddresses
+      otherAddresses,
+      shop
     } = props;
-    const [address, setAddress] = (0, import_react32.useState)(null);
-    const [fieldErrors, setFieldErrors] = (0, import_react32.useState)({});
-    (0, import_react32.useEffect)(() => {
+    const [address, setAddress] = (0, import_react36.useState)(null);
+    const [fieldErrors, setFieldErrors] = (0, import_react36.useState)({});
+    (0, import_react36.useEffect)(() => {
       setAddress(initialAddress);
     }, [initialAddress]);
-    (0, import_react32.useEffect)(() => {
+    (0, import_react36.useEffect)(() => {
       setFieldErrors({});
     }, [address == null ? void 0 : address.firstName, address == null ? void 0 : address.lastName, address == null ? void 0 : address.address1, address == null ? void 0 : address.city, address == null ? void 0 : address.zip, address == null ? void 0 : address.country]);
     function onCountryCodeChange(value) {
@@ -20711,6 +20812,9 @@ ${errorInfo.componentStack}`);
         if (typeof address[field] != "string" || address[field].trim().length < 1) {
           newFieldErrors[field] = "This field is required";
         }
+      }
+      if (!address.shippingMethod) {
+        newFieldErrors.shippingMethod = "You must choose a shipping method for this address";
       }
       if (Object.values(newFieldErrors).length > 0) {
         setFieldErrors(newFieldErrors);
@@ -20738,22 +20842,26 @@ ${errorInfo.componentStack}`);
       }
       return false;
     }
+    function onDeliveryMethodChange(value) {
+      const nextAddress = __spreadProps(__spreadValues({}, address), { shippingMethod: value });
+      setAddress(nextAddress);
+    }
     if (!address)
       return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       Modal2,
       {
         id,
         padding: true,
         onOpen: () => setAddress(initialAddress),
         title: address.key ? "Edit Address" : "Add address",
-        children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Form2, { onSubmit: onAddressSubmit, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Form2, { onSubmit: onAddressSubmit, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
           BlockLayout2,
           {
             spacing: "base",
             rows: "auto",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 Select2,
                 {
                   label: "Country/Region",
@@ -20762,8 +20870,8 @@ ${errorInfo.componentStack}`);
                   onChange: onCountryCodeChange
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineLayout2, { spacing: "base", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(InlineLayout2, { spacing: "base", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   TextField2,
                   {
                     label: "First Name (Optional)",
@@ -20771,7 +20879,7 @@ ${errorInfo.componentStack}`);
                     value: address.firstName
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   TextField2,
                   {
                     label: "Last Name",
@@ -20782,7 +20890,7 @@ ${errorInfo.componentStack}`);
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 TextField2,
                 {
                   label: "Address",
@@ -20792,7 +20900,7 @@ ${errorInfo.componentStack}`);
                   error: fieldErrors.address1
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 TextField2,
                 {
                   label: "Apartment, suite, etc. (Optional)",
@@ -20800,8 +20908,8 @@ ${errorInfo.componentStack}`);
                   onInput: (value) => setAddress((addr) => __spreadProps(__spreadValues({}, addr), { address2: value }))
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineLayout2, { spacing: "base", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(InlineLayout2, { spacing: "base", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   TextField2,
                   {
                     label: "City",
@@ -20811,7 +20919,7 @@ ${errorInfo.componentStack}`);
                     error: fieldErrors.city
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   TextField2,
                   {
                     label: "Postcode",
@@ -20822,41 +20930,41 @@ ${errorInfo.componentStack}`);
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, { spacing: "tight" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Heading2, { children: "Shipping Items" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: "Select the items you would like to send to this address" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockStack2, { spacing: "tight", children: cartLines.map((line) => {
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, { spacing: "tight" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(BlockStack2, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Heading2, { children: "Shipping Items" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: "Select the items you would like to send to this address" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockStack2, { spacing: "tight", children: cartLines.map((line) => {
                   var _a;
                   if (lineItemAssignedToOtherAddress(line.id))
                     return null;
-                  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                     Pressable2,
                     {
                       border: "base",
                       cornerRadius: "base",
                       padding: "base",
                       onPress: () => onLineItemPress(line.id),
-                      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+                      children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
                         InlineLayout2,
                         {
                           columns: ["80%", "fill"],
                           blockAlignment: "center",
                           spacing: "base",
                           children: [
-                            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+                            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
                               InlineStack2,
                               {
                                 spacing: "base",
                                 columns: "auto",
                                 blockAlignment: "center",
                                 children: [
-                                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ProductThumbnail2, { source: line.merchandise.image.url, opacity: true }),
-                                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { children: line.merchandise.title }, line.id)
+                                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ProductThumbnail2, { source: line.merchandise.image.url, opacity: true }),
+                                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: line.merchandise.title }, line.id)
                                 ]
                               }
                             ),
-                            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { inlineAlignment: "end", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { inlineAlignment: "end", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                               Checkbox2,
                               {
                                 checked: (_a = address == null ? void 0 : address.items) == null ? void 0 : _a.includes(line.id),
@@ -20871,8 +20979,20 @@ ${errorInfo.componentStack}`);
                   );
                 }) })
               ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(InlineLayout2, { blockAlignment: "center", children: [
-                address.key && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, { spacing: "tight" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                DeliveryMethodSelection,
+                {
+                  countryCode: address.countryCode,
+                  addressId: address.id,
+                  onChange: onDeliveryMethodChange,
+                  selected: address.shippingMethod ? address.shippingMethod : "",
+                  shop
+                }
+              ),
+              fieldErrors.shippingMethod && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { appearance: "critical", children: fieldErrors.shippingMethod }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(InlineLayout2, { blockAlignment: "center", children: [
+                address.key && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   Button2,
                   {
                     accessibilityRole: "button",
@@ -20883,7 +21003,7 @@ ${errorInfo.componentStack}`);
                     children: "Delete"
                   }
                 ) }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { inlineAlignment: "end", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { inlineAlignment: "end", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   Button2,
                   {
                     loading: saving,
@@ -20900,24 +21020,26 @@ ${errorInfo.componentStack}`);
   }
 
   // extensions/multi-shipping-address/src/Checkout.jsx
-  var import_jsx_runtime5 = __toESM(require_jsx_runtime());
+  var import_jsx_runtime6 = __toESM(require_jsx_runtime());
   var Checkout_default = reactExtension(
     "purchase.checkout.delivery-address.render-after",
-    () => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Extension, {})
+    () => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Extension, {})
   );
   function Extension() {
-    const { ui, query } = useApi();
+    const { ui, query, shop } = useApi();
     const cartLines = useCartLines();
     const shippableCartLines = cartLines.filter((line) => line.merchandise.requiresShipping);
-    const [shippingCountries, setShippingCountries] = (0, import_react33.useState)([]);
-    const [additionalAddressEdit, setAdditionalAddressEdit] = (0, import_react33.useState)({});
-    const [addressSaving, setAddressSaving] = (0, import_react33.useState)(false);
-    const [addressDeleting, setAddressDeleting] = (0, import_react33.useState)(false);
-    const [additionalAddresses, setAdditionalAddresses] = (0, import_react33.useState)([]);
-    const [openDisclosures, setOpenDisclosures] = (0, import_react33.useState)([]);
+    const [shippingCountries, setShippingCountries] = (0, import_react37.useState)([]);
+    const [additionalAddressEdit, setAdditionalAddressEdit] = (0, import_react37.useState)({});
+    const [addressSaving, setAddressSaving] = (0, import_react37.useState)(false);
+    const [addressDeleting, setAddressDeleting] = (0, import_react37.useState)(false);
+    const [additionalAddresses, setAdditionalAddresses] = (0, import_react37.useState)([]);
+    const [openDisclosures, setOpenDisclosures] = (0, import_react37.useState)([]);
+    const [selectedShippingMethods, setSelectedShippingMethods] = (0, import_react37.useState)({});
     const attributes = useAttributes();
     const applyAttributeChange = useApplyAttributeChange();
-    (0, import_react33.useEffect)(() => {
+    const applyCartLinesChange = useApplyCartLinesChange();
+    (0, import_react37.useEffect)(() => {
       query(
         `query {
               shop {
@@ -20928,7 +21050,7 @@ ${errorInfo.componentStack}`);
         setShippingCountries(data.shop.shipsToCountries);
       }).catch(console.error);
     }, []);
-    (0, import_react33.useEffect)(() => {
+    (0, import_react37.useEffect)(() => {
       for (let i = 0; i < attributes.length; i++) {
         if (attributes[i].key != "__additional_addresses")
           continue;
@@ -21007,6 +21129,9 @@ ${errorInfo.componentStack}`);
         }
         setAddressSaving(false);
         setAdditionalAddresses(newAdditialAddresses);
+        const nextSelectedShippingMethods = __spreadProps(__spreadValues({}, selectedShippingMethods), { [additionalAddress.id]: additionalAddress.shippingMethod });
+        setSelectedShippingMethods(nextSelectedShippingMethods);
+        applyShippingMethodLineItemProps(nextSelectedShippingMethods, newAdditialAddresses);
       });
     }
     ;
@@ -21017,16 +21142,22 @@ ${errorInfo.componentStack}`);
           return;
         }
         setAddressDeleting(true);
-        const newAdditialAddresses = [...additionalAddresses];
-        newAdditialAddresses.splice(currentAddressIndex, 1);
+        const newAdditionalAddresses = [...additionalAddresses];
+        newAdditionalAddresses.splice(currentAddressIndex, 1);
         yield applyAttributeChange({
           type: "updateAttribute",
           key: "__additional_addresses",
-          value: JSON.stringify(newAdditialAddresses)
+          value: JSON.stringify(newAdditionalAddresses)
         });
         ui.overlay.close(`AddressEditModal_${addressId}`);
         setAddressDeleting(false);
-        setAdditionalAddresses(newAdditialAddresses);
+        setAdditionalAddresses(newAdditionalAddresses);
+        const nextSelectedShippingMethods = __spreadValues({}, selectedShippingMethods);
+        if (nextSelectedShippingMethods[addressId]) {
+          delete nextSelectedShippingMethods[addressId];
+        }
+        setSelectedShippingMethods(nextSelectedShippingMethods);
+        applyShippingMethodLineItemProps(nextSelectedShippingMethods, newAdditionalAddresses);
       });
     }
     function onAddAdditionalAddressClick() {
@@ -21041,12 +21172,55 @@ ${errorInfo.componentStack}`);
         city: "",
         province: "",
         zip: "",
-        items: []
+        items: [],
+        shippingMethod: null
       });
     }
+    function onDeliveryMethodChange(addressId, value) {
+      const nextSelectedShippingMethods = __spreadProps(__spreadValues({}, selectedShippingMethods), { [addressId]: value });
+      setSelectedShippingMethods(nextSelectedShippingMethods);
+      applyShippingMethodLineItemProps(nextSelectedShippingMethods, additionalAddresses);
+    }
+    function applyShippingMethodLineItemProps(addressShippingMethods, additionalAddresses2) {
+      return __async(this, null, function* () {
+        const cartLineChanges = [];
+        const addressAssignedCartLines2 = additionalAddresses2.map((addr) => addr.items).flat(1);
+        let primaryAddressLineItems2 = shippableCartLines.filter((line) => !addressAssignedCartLines2.includes(line.id));
+        if (addressShippingMethods.primary && primaryAddressLineItems2.length > 0) {
+          for (let i = 0; i < primaryAddressLineItems2.length; i++) {
+            cartLineChanges.push({
+              type: "updateCartLine",
+              id: primaryAddressLineItems2[i].id,
+              attributes: [...primaryAddressLineItems2[i].attributes, { key: "_shipping_rate", value: `primary:${addressShippingMethods.primary}` }]
+            });
+          }
+        }
+        console.log(addressShippingMethods, additionalAddresses2);
+        for (let i = 0; i < additionalAddresses2.length; i++) {
+          const addr = additionalAddresses2[i];
+          if (!addressShippingMethods[addr.id])
+            continue;
+          let lineItems = shippableCartLines.filter((line) => addr.items.includes(line.id));
+          for (let j = 0; j < lineItems.length; j++) {
+            cartLineChanges.push({
+              type: "updateCartLine",
+              id: lineItems[j].id,
+              attributes: [...primaryAddressLineItems2[j].attributes, { key: "_shipping_rate", value: `${addr.id}:${addressShippingMethods[addr.id]}` }]
+            });
+          }
+        }
+        console.log(cartLineChanges);
+        for (let i = 0; i < cartLineChanges.length; i++) {
+          let result = yield applyCartLinesChange(cartLineChanges[i]);
+          console.log(result);
+        }
+      });
+    }
+    const addressAssignedCartLines = additionalAddresses.map((addr) => addr.items).flat(1);
+    const primaryAddressLineItems = shippableCartLines.filter((line) => !addressAssignedCartLines.includes(line.id));
     if (shippableCartLines.length < 2)
       return null;
-    const additionalAddressCreateModal = /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    const additionalAddressCreateModal = /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       AddressEditModal,
       {
         id: "AddressCreateModal",
@@ -21055,32 +21229,31 @@ ${errorInfo.componentStack}`);
         saving: addressSaving,
         cartLines: shippableCartLines,
         otherAddresses: additionalAddresses,
-        countryOptions: countryOptions_default.filter((opt) => shippingCountries.includes(opt.value))
+        countryOptions: countryOptions_default.filter((opt) => shippingCountries.includes(opt.value)),
+        shop: shop.myshopifyDomain
       }
     );
-    const addressAssignedCartLines = additionalAddresses.map((addr) => addr.items).flat(1);
-    const primaryAddressLineItems = shippableCartLines.filter((line) => !addressAssignedCartLines.includes(line.id));
-    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(BlockStack2, { spacing: "base", children: [
-      addressAssignedCartLines.length == shippableCartLines.length && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Banner2, { status: "warning", children: "No items will be sent to this address" }),
-      additionalAddresses.length > 0 && primaryAddressLineItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(BlockStack2, { spacing: "base", children: [
+      addressAssignedCartLines.length == shippableCartLines.length && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Banner2, { status: "warning", children: "No items will be sent to this address" }),
+      additionalAddresses.length > 0 && primaryAddressLineItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         BlockLayout2,
         {
           rows: "auto",
           inlineAlignment: "start",
           spacing: "base",
-          children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+          children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
             Disclosure2,
             {
               onToggle: setOpenDisclosures,
               spacing: "base",
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                   Pressable2,
                   {
                     toggles: `selected-items-primary`,
                     kind: "plain",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(InlineLayout2, { blockAlignment: "center", spacing: "extraTight", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+                    children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(InlineLayout2, { blockAlignment: "center", spacing: "extraTight", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
                         Text2,
                         {
                           size: "small",
@@ -21093,7 +21266,7 @@ ${errorInfo.componentStack}`);
                           ]
                         }
                       ),
-                      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                         Icon2,
                         {
                           source: openDisclosures.includes(`selected-items-primary`) ? "chevronUp" : "chevronDown",
@@ -21104,17 +21277,27 @@ ${errorInfo.componentStack}`);
                     ] })
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { id: `selected-items-primary`, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(List2, { spacing: "base", children: shippableCartLines.filter((line) => !addressAssignedCartLines.includes(line.id)).map((lineItem) => {
-                  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-primary`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: shippableCartLines.filter((line) => !addressAssignedCartLines.includes(line.id)).map((lineItem) => {
+                  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
                 }) }) })
               ]
             }
           )
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Heading2, { children: "Additional shipping addresses" }) }),
-      additionalAddresses.map((addr) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+      primaryAddressLineItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+        DeliveryMethodSelection,
+        {
+          countryCode: "GB",
+          addressId: "primary",
+          onChange: (value) => onDeliveryMethodChange("primary", value),
+          selected: selectedShippingMethods.primary ? selectedShippingMethods.primary : "",
+          shop: shop.myshopifyDomain
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(BlockSpacer2, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Heading2, { children: "Additional shipping addresses" }) }),
+      additionalAddresses.map((addr) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
         BlockLayout2,
         {
           rows: "auto",
@@ -21124,10 +21307,10 @@ ${errorInfo.componentStack}`);
           spacing: "tight",
           cornerRadius: "base",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
               Pressable2,
               {
-                overlay: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                overlay: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                   AddressEditModal,
                   {
                     id: `AddressEditModal_${addr.id}`,
@@ -21138,25 +21321,26 @@ ${errorInfo.componentStack}`);
                     cartLines: shippableCartLines,
                     deleting: addressDeleting,
                     otherAddresses: additionalAddresses.filter((additional) => additional.id != addr.id),
-                    countryOptions: countryOptions_default.filter((opt) => shippingCountries.includes(opt.value))
+                    countryOptions: countryOptions_default.filter((opt) => shippingCountries.includes(opt.value)),
+                    shop: shop.myshopifyDomain
                   }
                 ),
-                children: addressToString(addr)
+                children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: addressToString(addr) })
               }
             ),
-            addr.items.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+            addr.items.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
               Disclosure2,
               {
                 onToggle: setOpenDisclosures,
                 spacing: "base",
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                     Pressable2,
                     {
                       toggles: `selected-items-${addr.id}`,
                       kind: "plain",
-                      children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(InlineLayout2, { blockAlignment: "center", spacing: "extraTight", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+                      children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(InlineLayout2, { blockAlignment: "center", spacing: "extraTight", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
                           Text2,
                           {
                             size: "small",
@@ -21169,7 +21353,7 @@ ${errorInfo.componentStack}`);
                             ]
                           }
                         ),
-                        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                           Icon2,
                           {
                             source: openDisclosures.includes(`selected-items-${addr.id}`) ? "chevronUp" : "chevronDown",
@@ -21180,11 +21364,11 @@ ${errorInfo.componentStack}`);
                       ] })
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(List2, { spacing: "base", children: addr.items.map((itemId) => {
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: addr.items.map((itemId) => {
                     const lineItem = shippableCartLines.find((line) => line.id == itemId);
                     if (!lineItem)
                       return null;
-                    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, itemId);
+                    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, itemId);
                   }) }) })
                 ]
               }
@@ -21193,18 +21377,18 @@ ${errorInfo.componentStack}`);
         },
         addr.id
       )),
-      addressAssignedCartLines.length < shippableCartLines.length ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      addressAssignedCartLines.length < shippableCartLines.length ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         Button2,
         {
           kind: "secondary",
           onPress: onAddAdditionalAddressClick,
           overlay: additionalAddressCreateModal,
-          children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(InlineStack2, { blockAlignment: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Icon2, { source: "plus" }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: "Add shipping address" })
+          children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(InlineStack2, { blockAlignment: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Icon2, { source: "plus" }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: "Add shipping address" })
           ] })
         }
-      ) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Banner2, { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: "All order items have been assigned to an additional address" }) })
+      ) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Banner2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: "All order items have been assigned to an additional address" }) })
     ] });
   }
 })();

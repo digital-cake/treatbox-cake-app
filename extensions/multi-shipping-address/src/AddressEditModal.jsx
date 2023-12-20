@@ -19,6 +19,8 @@ import {
     Checkbox
 } from '@shopify/ui-extensions-react/checkout';
 
+import DeliveryMethodSelection from './DeliveryMethodSelection.jsx';
+
 export default function AddressEditModal(props) {
 
     const {
@@ -28,9 +30,10 @@ export default function AddressEditModal(props) {
         countryOptions,
         saving,
         cartLines,
-         deleting,
-         onDelete,
-         otherAddresses
+        deleting,
+        onDelete,
+        otherAddresses,
+        shop
     } = props;
 
     const [address, setAddress] = useState(null);
@@ -63,6 +66,10 @@ export default function AddressEditModal(props) {
             if (typeof address[field] != 'string' || address[field].trim().length < 1) {
                 newFieldErrors[field] = "This field is required";
             }
+        }
+
+        if (!address.shippingMethod) {
+            newFieldErrors.shippingMethod = "You must choose a shipping method for this address";
         }
 
         if (Object.values(newFieldErrors).length > 0) {
@@ -98,6 +105,11 @@ export default function AddressEditModal(props) {
         }
 
         return false;
+    }
+
+    function onDeliveryMethodChange(value) {
+        const nextAddress = { ...address, shippingMethod: value };
+        setAddress(nextAddress);
     }
 
     if (!address) return null;
@@ -198,6 +210,20 @@ export default function AddressEditModal(props) {
                         </BlockStack>
                     </View>
 
+                    <BlockSpacer spacing="tight" />
+
+                    <DeliveryMethodSelection
+                        countryCode={address.countryCode}
+                        addressId={address.id}
+                        onChange={onDeliveryMethodChange}
+                        selected={address.shippingMethod ? address.shippingMethod : ""}
+                        shop={shop} />
+
+                    {
+                        fieldErrors.shippingMethod && (
+                            <Text appearance="critical">{fieldErrors.shippingMethod}</Text>
+                        )
+                    }
 
                     <InlineLayout blockAlignment="center">
                         {

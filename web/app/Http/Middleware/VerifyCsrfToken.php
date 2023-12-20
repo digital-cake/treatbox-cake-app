@@ -16,6 +16,7 @@ class VerifyCsrfToken extends Middleware
         'api/webhooks',
         'api/settings',
         'api/active-carrier-service',
-        'api/shipping-rates/*'
+        'api/shipping-rates/*',
+        'api/carrier-service/callback'
     ];
 }

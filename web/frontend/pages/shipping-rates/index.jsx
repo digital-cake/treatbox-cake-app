@@ -120,6 +120,8 @@ export default function ShippingRates() {
                                                         as="h3">
                                                         {item.name}
                                                     </Text>
+                                                    <HorizontalStack align="space-between" gap="3">
+                                                    <div>{item.description}</div>
                                                     {
                                                         item.base_rate > 0 ? (
                                                             <div>£{item.base_rate}</div>
@@ -127,6 +129,8 @@ export default function ShippingRates() {
                                                             <div>Free</div>
                                                         )
                                                     }
+                                                    </HorizontalStack>
+
                                                 </VerticalStack>
 
                                             </ResourceItem>

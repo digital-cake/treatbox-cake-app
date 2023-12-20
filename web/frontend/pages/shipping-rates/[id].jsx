@@ -278,66 +278,71 @@ export default function ShippingRate() {
                                         onChange={(value) => setRateProp('name', value)}
                                         error={fieldErrors['shipping_rate.name'] ? fieldErrors['shipping_rate.name'].join("\n") : null} />
 
+                                <TextField multiline={2}
+                                            label="Description"
+                                            value={rate.description}
+                                            onChange={(value) => setRateProp('description', value)}
+                                            error={fieldErrors['shipping_rate.description'] ? fieldErrors['shipping_rate.description'].join("\n") : null} />
 
-                                    <TextField
-                                            autoComplete="off"
-                                            type="number"
-                                            label="Price"
-                                            prefix="£"
-                                            onChange={(value) => setRateProp('base_rate', value)}
-                                            value={rate.base_rate}
-                                            error={fieldErrors['shipping_rate.base_rate'] ? fieldErrors['shipping_rate.base_rate'].join("\n") : null}  />
+                                <TextField
+                                        autoComplete="off"
+                                        type="number"
+                                        label="Price"
+                                        prefix="£"
+                                        onChange={(value) => setRateProp('base_rate', value)}
+                                        value={rate.base_rate}
+                                        error={fieldErrors['shipping_rate.base_rate'] ? fieldErrors['shipping_rate.base_rate'].join("\n") : null}  />
 
-                                    <Checkbox label="Free if cart total is above a specified price"
+                                <Checkbox label="Free if cart total is above a specified price"
                                             checked={rate.free_delivery_threshold_enabled}
                                             onChange={() => setRateProp('free_delivery_threshold_enabled', !rate.free_delivery_threshold_enabled)} />
 
-                                    {
-                                        rate.free_delivery_threshold_enabled && (
-                                            <TextField
-                                                autoComplete="off"
-                                                type="number"
-                                                prefix="£"
-                                                label="Free if cart total is above:"
-                                                value={rate.free_delivery_threshold}
-                                                onChange={(value) => setRateProp('free_delivery_threshold', value)}
-                                                error={fieldErrors.free_delivery_threshold ? fieldErrors.free_delivery_threshold.join("\n") : null}
-                                                />
-                                        )
-                                    }
-
-                                    <Combobox
-                                        allowMultiple
-                                        activator={
-                                            <Combobox.TextField
+                                {
+                                    rate.free_delivery_threshold_enabled && (
+                                        <TextField
                                             autoComplete="off"
-                                            label="Countries"
-                                            value={countrySearchValue}
-                                            suggestion={null}
-                                            placeholder="Search countries"
-                                            verticalContent={verticalContentMarkup}
-                                            onChange={setCountrySearchValue}
-                                          />
-                                        }>
-                                           <Listbox
-                                                autoSelection={AutoSelection.None}
-                                                onSelect={updateSelection}
-                                            >
-                                                {
-                                                    countryOptions.length > 0 && countryOptions.map((option) => (
-                                                        <Listbox.Option
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        selected={rate.countries.includes(option.value)}
-                                                        accessibilityLabel={option.label}>
-                                                            <Listbox.TextOption selected={rate.countries.includes(option.value)}>
-                                                                {option.label}
-                                                            </Listbox.TextOption>
-                                                        </Listbox.Option>
-                                                    ))
-                                                }
-                                            </Listbox>
-                                    </Combobox>
+                                            type="number"
+                                            prefix="£"
+                                            label="Free if cart total is above:"
+                                            value={rate.free_delivery_threshold}
+                                            onChange={(value) => setRateProp('free_delivery_threshold', value)}
+                                            error={fieldErrors.free_delivery_threshold ? fieldErrors.free_delivery_threshold.join("\n") : null}
+                                            />
+                                    )
+                                }
+
+                                <Combobox
+                                    allowMultiple
+                                    activator={
+                                        <Combobox.TextField
+                                        autoComplete="off"
+                                        label="Countries"
+                                        value={countrySearchValue}
+                                        suggestion={null}
+                                        placeholder="Search countries"
+                                        verticalContent={verticalContentMarkup}
+                                        onChange={setCountrySearchValue}
+                                        />
+                                    }>
+                                        <Listbox
+                                            autoSelection={AutoSelection.None}
+                                            onSelect={updateSelection}
+                                        >
+                                            {
+                                                countryOptions.length > 0 && countryOptions.map((option) => (
+                                                    <Listbox.Option
+                                                    key={option.value}
+                                                    value={option.value}
+                                                    selected={rate.countries.includes(option.value)}
+                                                    accessibilityLabel={option.label}>
+                                                        <Listbox.TextOption selected={rate.countries.includes(option.value)}>
+                                                            {option.label}
+                                                        </Listbox.TextOption>
+                                                    </Listbox.Option>
+                                                ))
+                                            }
+                                        </Listbox>
+                                </Combobox>
 
                             </VerticalStack>
                         </AlphaCard>

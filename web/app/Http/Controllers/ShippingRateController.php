@@ -53,6 +53,7 @@ class ShippingRateController extends Controller
         $validator = Validator::make($request->all(), [
             'shipping_rate' => ['required', 'array'],
             'shipping_rate.name' => ['required', 'string', 'max:255'],
+            'shipping_rate.description' => ['string', 'nullable', ''],
             'shipping_rate.countries' => ['array', 'nullable'],
             'shipping_rate.base_rate' => ['required', 'numeric'],
             'shipping_rate.free_delivery_threshold_enabled' => ['boolean', 'required'],
@@ -98,6 +99,10 @@ class ShippingRateController extends Controller
             }
 
             $rate->$prop = $value;
+        }
+
+        if (empty($validated['shipping_rate']['description'])) {
+            $rate->description = null;
         }
 
         if (empty($validated['shipping_rate']['free_delivery_threshold_enabled'])) {

@@ -6,6 +6,7 @@ import {
     useBuyerJourneyIntercept,
     useAttributes,
     useApplyAttributeChange,
+    useApplyCartLinesChange,
     useApi,
     Banner,
     Text,
@@ -32,6 +33,7 @@ import {
 
 import countryOptions from './countryOptions';
 import AddressEditModal from './AddressEditModal.jsx';
+import DeliveryMethodSelection from './DeliveryMethodSelection.jsx';
 
 export default reactExtension(
   'purchase.checkout.delivery-address.render-after',
@@ -40,7 +42,7 @@ export default reactExtension(
 
 function Extension() {
 
-    const {ui, query} = useApi();
+    const {ui, query, shop} = useApi();
 
     const cartLines = useCartLines();
     const shippableCartLines  = cartLines.filter(line => line.merchandise.requiresShipping);
@@ -51,9 +53,12 @@ function Extension() {
     const [addressDeleting, setAddressDeleting] = useState(false);
     const [additionalAddresses, setAdditionalAddresses] = useState([]);
     const [openDisclosures, setOpenDisclosures] =  useState([]);
+    const [selectedShippingMethods, setSelectedShippingMethods] = useState({});
 
     const attributes = useAttributes();
     const applyAttributeChange = useApplyAttributeChange();
+
+    const applyCartLinesChange = useApplyCartLinesChange();
 
     useEffect(() => {
 
@@ -185,6 +190,10 @@ function Extension() {
 
         setAddressSaving(false);
         setAdditionalAddresses(newAdditialAddresses);
+
+        const nextSelectedShippingMethods = { ...selectedShippingMethods, [additionalAddress.id]: additionalAddress.shippingMethod };
+        setSelectedShippingMethods(nextSelectedShippingMethods);
+        applyShippingMethodLineItemProps(nextSelectedShippingMethods, newAdditialAddresses);
     };
 
     async function onDeleteAddress(addressId) {
@@ -196,19 +205,29 @@ function Extension() {
 
         setAddressDeleting(true);
 
-        const newAdditialAddresses = [ ...additionalAddresses ];
-        newAdditialAddresses.splice(currentAddressIndex, 1);
+        const newAdditionalAddresses = [ ...additionalAddresses ];
+        newAdditionalAddresses.splice(currentAddressIndex, 1);
 
         await applyAttributeChange({
             type: 'updateAttribute',
             key: '__additional_addresses',
-            value: JSON.stringify(newAdditialAddresses)
+            value: JSON.stringify(newAdditionalAddresses)
         });
 
         ui.overlay.close(`AddressEditModal_${addressId}`);
 
         setAddressDeleting(false);
-        setAdditionalAddresses(newAdditialAddresses);
+        setAdditionalAddresses(newAdditionalAddresses);
+
+
+        const nextSelectedShippingMethods = { ...selectedShippingMethods };
+
+        if (nextSelectedShippingMethods[addressId]) {
+            delete nextSelectedShippingMethods[addressId];
+        }
+
+        setSelectedShippingMethods(nextSelectedShippingMethods);
+        applyShippingMethodLineItemProps(nextSelectedShippingMethods, newAdditionalAddresses);
     }
 
     function onAddAdditionalAddressClick() {
@@ -223,9 +242,67 @@ function Extension() {
             city: '',
             province: '',
             zip: '',
-            items: []
+            items: [],
+            shippingMethod: null
         })
     }
+
+    function onDeliveryMethodChange(addressId, value) {
+        const nextSelectedShippingMethods = { ...selectedShippingMethods, [addressId]: value };
+        setSelectedShippingMethods(nextSelectedShippingMethods);
+        applyShippingMethodLineItemProps(nextSelectedShippingMethods, additionalAddresses);
+    }
+
+    async function applyShippingMethodLineItemProps(addressShippingMethods, additionalAddresses) {
+
+        const cartLineChanges = [];
+
+        const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
+        let primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
+
+        if (addressShippingMethods.primary && primaryAddressLineItems.length > 0) {
+
+            for (let i = 0; i < primaryAddressLineItems.length; i++) {
+                cartLineChanges.push(({
+                    type: 'updateCartLine',
+                    id: primaryAddressLineItems[i].id,
+                    attributes: [ ...primaryAddressLineItems[i].attributes,  { key: "_shipping_rate", value: `primary:${addressShippingMethods.primary}` } ]
+                }));
+            }
+
+        }
+
+        console.log(addressShippingMethods, additionalAddresses);
+
+        for (let i = 0; i < additionalAddresses.length; i++) {
+
+            const addr = additionalAddresses[i];
+
+            if (!addressShippingMethods[addr.id]) continue;
+
+            let lineItems = shippableCartLines.filter(line => addr.items.includes(line.id));
+
+            for (let j = 0; j < lineItems.length; j++) {
+                cartLineChanges.push(({
+                    type: 'updateCartLine',
+                    id: lineItems[j].id,
+                    attributes: [ ...primaryAddressLineItems[j].attributes,  { key: "_shipping_rate", value: `${addr.id}:${addressShippingMethods[addr.id]}` } ]
+                }));
+            }
+        }
+
+        console.log(cartLineChanges);
+
+        for (let i = 0; i < cartLineChanges.length; i++) {
+            let result = await applyCartLinesChange(cartLineChanges[i]);
+            console.log(result);
+        }
+
+    }
+
+
+    const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
+    const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
 
     if (shippableCartLines.length < 2) return null;
 
@@ -238,11 +315,9 @@ function Extension() {
             cartLines={shippableCartLines}
             otherAddresses={additionalAddresses}
             countryOptions={countryOptions.filter(opt => shippingCountries.includes(opt.value))}
+            shop={shop.myshopifyDomain}
             />
     );
-
-    const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
-    const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
 
     return (
 
@@ -297,6 +372,17 @@ function Extension() {
             )
         }
 
+        {
+            primaryAddressLineItems.length > 0 && (
+                <DeliveryMethodSelection
+                    countryCode="GB"
+                    addressId="primary"
+                    onChange={(value) => onDeliveryMethodChange('primary', value)}
+                    selected={selectedShippingMethods.primary ? selectedShippingMethods.primary : ""}
+                    shop={shop.myshopifyDomain} />
+            )
+        }
+
         <BlockSpacer />
 
         <View>
@@ -326,11 +412,11 @@ function Extension() {
                             deleting={addressDeleting}
                             otherAddresses={additionalAddresses.filter(additional => additional.id != addr.id)}
                             countryOptions={countryOptions.filter(opt => shippingCountries.includes(opt.value))}
+                            shop={shop.myshopifyDomain}
                             />
                         )}>
 
-                        {addressToString(addr)}
-
+                        <Text>{addressToString(addr)}</Text>
 
                     </Pressable>
 

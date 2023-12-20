@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\ShippingRate;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +17,19 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return "Hello API";
+});
+
+Route::get('/shipping-rates', function (Request $request) {
+
+    $shop = $request->query('shop');
+    $country_code = $request->query('country');
+
+    $shipping_rates = ShippingRate::where('shop', $shop)
+                ->where('countries', 'LIKE', "%{$country_code}%")
+                ->get();
+
+    return response([
+        'rates' => $shipping_rates
+    ], 200);
+
 });
