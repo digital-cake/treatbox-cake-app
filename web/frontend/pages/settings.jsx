@@ -20,6 +20,7 @@ import { getSessionToken } from "@shopify/app-bridge/utilities";
 import { useAppBridge } from "@shopify/app-bridge-react";
 
 import CarrierServiceOptionLayoutSection from "../components/CarrierServiceOptionLayoutSection";
+import ByobBundlesOptionLayoutSection from "../components/ByobBundlesOptionLayoutSection";
 
 export default function SettingsPage() {
 
@@ -136,42 +137,8 @@ export default function SettingsPage() {
                         <Divider />
                     </Layout.Section>
 
-                    <Layout.Section oneThird>
-                        <Box paddingBlockStart={4}>
-                            <VerticalStack gap="4">
-                                <Text id="CarrierServices" variant="headingMd">BYOB Bundles</Text>
-                                <Text color="subdued" as="p">
-                                    Enable disable "Build your own box" bundling.
-                                </Text>
-                            </VerticalStack>
-                        </Box>
-                    </Layout.Section>
-
-                    <Layout.Section>
-                        <AlphaCard>
-                            {
-                                settingsLoading ? (
-                                    <div className="card-loader-wrapper">
-                                        <Spinner />
-                                    </div>
-                                ) : (
-                                    <VerticalStack gap="4">
-                                            <TextField label="API Key"
-                                                onChange={(value) => onChangeSettingOption('click_and_drop_api_key', value)}
-                                                value={settingOptions.click_and_drop_api_key } />
-
-                                        <HorizontalStack align="end">
-                                            <Button primary
-                                                    loading={saving}
-                                                    onClick={onSaveSettings}>Save</Button>
-                                        </HorizontalStack>
-
-                                    </VerticalStack>
-                                )
-                            }
-                        </AlphaCard>
-                    </Layout.Section>
-
+                    <ByobBundlesOptionLayoutSection
+                        displayToast={displayToast} />
 
                     <Layout.Section fullWidth>
                         <Divider />

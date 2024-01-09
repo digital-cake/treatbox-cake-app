@@ -20713,7 +20713,7 @@ ${errorInfo.componentStack}`);
     const [loading, setLoading] = (0, import_react35.useState)(false);
     (0, import_react35.useEffect)(() => {
       setLoading(true);
-      fetch(`https://d8fc-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
+      fetch(`https://63ec-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
         setRates(response.rates);
         setLoading(false);
       }).catch((err) => {
@@ -21393,4 +21393,3 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
-//# sourceMappingURL=multi-shipping-address.js.map

@@ -22,6 +22,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ActiveCarrierServiceController;
 use App\Http\Controllers\ShippingRateController;
 use App\Http\Controllers\ShopifyCarrierServiceCallbackController;
+use App\Http\Controllers\ShopifyCartTransformController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +150,12 @@ Route::controller(ShippingRateController::class)->group(function() {
 
 Route::controller(ShopifyCarrierServiceCallbackController::class)->group(function() {
     Route::post('/api/carrier-service/callback', 'handle');
+});
+
+Route::controller(ShopifyCartTransformController::class)->group(function() {
+    Route::get('/api/cart-transform/{function_name}', 'get');
+    Route::post('/api/cart-transform/deactivate', 'deactivate');
+    Route::post('/api/cart-transform/{function_name}/activate', 'activate');
 });
 
 Route::post('/api/webhooks', function (Request $request) {

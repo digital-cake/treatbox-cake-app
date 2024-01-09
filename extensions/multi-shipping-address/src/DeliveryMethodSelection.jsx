@@ -22,7 +22,7 @@ export default function DeliveryMethodSelection({ countryCode, shop, onChange, s
 
         setLoading(true);
 
-        fetch(`https://d8fc-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`)
+        fetch(`https://63ec-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`)
         .then(response => response.json())
         .then(response => {
             setRates(response.rates);
