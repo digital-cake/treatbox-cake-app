@@ -21040,6 +21040,7 @@ ${errorInfo.componentStack}`);
     const applyAttributeChange = useApplyAttributeChange();
     const applyCartLinesChange = useApplyCartLinesChange();
     (0, import_react37.useEffect)(() => {
+      console.log("Oi");
       query(
         `query {
               shop {

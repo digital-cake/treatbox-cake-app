@@ -2,19 +2,19 @@
 
 name = "Treatbox Cake App - Dev"
 client_id = "0eacd3a621cac73517105bb9f7becc6a"
-application_url = "https://0944-88-98-16-1.ngrok-free.app"
+application_url = "https://ad86-88-98-16-1.ngrok-free.app"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_products,write_shipping,write_orders"
+scopes = "read_products,write_shipping,write_orders,write_cart_transforms"
 
 [auth]
 redirect_urls = [
-  "https://0944-88-98-16-1.ngrok-free.app/auth/callback",
-  "https://0944-88-98-16-1.ngrok-free.app/auth/shopify/callback",
-  "https://0944-88-98-16-1.ngrok-free.app/api/auth/callback",
-  "https://0944-88-98-16-1.ngrok-free.app/.shopify/graphiql/auth/callback"
+  "https://ad86-88-98-16-1.ngrok-free.app/auth/callback",
+  "https://ad86-88-98-16-1.ngrok-free.app/auth/shopify/callback",
+  "https://ad86-88-98-16-1.ngrok-free.app/api/auth/callback",
+  "https://ad86-88-98-16-1.ngrok-free.app/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

@@ -12,9 +12,8 @@ type = "function"
   export = "run"
 
   [extensions.build]
-  command = "cargo wasi build --release"
-  path = "target/wasm32-wasi/release/byob-bundle.wasm"
-  watch = [ "src/**/*.rs" ]
+  command = ""
+  path = "dist/function.wasm"
 
   [extensions.ui.paths]
   create = "/"

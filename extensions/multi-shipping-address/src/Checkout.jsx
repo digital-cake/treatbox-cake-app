@@ -68,6 +68,8 @@ function Extension() {
         //     value: ''
         // });
 
+        console.log("Oi");
+
         query(
             `query {
               shop {
