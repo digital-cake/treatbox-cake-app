@@ -28,7 +28,8 @@ import {
     Form,
     Disclosure,
     List,
-    ListItem
+    ListItem,
+    useApplyShippingAddressChange
 } from '@shopify/ui-extensions-react/checkout';
 
 import countryOptions from './countryOptions';
@@ -39,6 +40,8 @@ export default reactExtension(
   'purchase.checkout.delivery-address.render-after',
   () => <Extension />,
 );
+
+const dataVariantId = 'gid://shopify/ProductVariant/47534018953535';
 
 function Extension() {
 
@@ -56,8 +59,8 @@ function Extension() {
     const [selectedShippingMethods, setSelectedShippingMethods] = useState({});
 
     const attributes = useAttributes();
-    const applyAttributeChange = useApplyAttributeChange();
 
+    const applyAttributeChange = useApplyAttributeChange();
     const applyCartLinesChange = useApplyCartLinesChange();
 
     useEffect(() => {
@@ -67,8 +70,6 @@ function Extension() {
         //     key: '__additional_addresses',
         //     value: ''
         // });
-
-        console.log("Oi");
 
         query(
             `query {
@@ -112,6 +113,26 @@ function Extension() {
         }
 
     }, [attributes]);
+
+    useEffect(() => {
+
+        for (let i = 0; i < cartLines.length; i++) {
+            if (cartLines[i].merchandise.id != dataVariantId) continue;
+
+            const shippingMethodAttr = cartLines[i].attributes.find(attr => attr.key == '_shipping_methods');
+
+            if (!shippingMethodAttr) break;
+
+            try {
+                const shippingMethodData = JSON.parse(shippingMethodAttr.value);
+                setSelectedShippingMethods(shippingMethodData);
+            } catch(err) {
+                break;
+            }
+
+        }
+
+    }, [cartLines]);
 
     useBuyerJourneyIntercept(({ canBlockProgress }) => {
         if (canBlockProgress) {
@@ -257,51 +278,27 @@ function Extension() {
 
     async function applyShippingMethodLineItemProps(addressShippingMethods, additionalAddresses) {
 
-        const cartLineChanges = [];
 
-        const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
-        let primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
+        const cartLinesChange = {
+            quantity: 1
+        };
 
-        if (addressShippingMethods.primary && primaryAddressLineItems.length > 0) {
+        const dataLine = cartLines.find(line => line.merchandise.id == dataVariantId );
 
-            for (let i = 0; i < primaryAddressLineItems.length; i++) {
-                cartLineChanges.push(({
-                    type: 'updateCartLine',
-                    id: primaryAddressLineItems[i].id,
-                    attributes: [ ...primaryAddressLineItems[i].attributes,  { key: "_shipping_rate", value: `primary:${addressShippingMethods.primary}` } ]
-                }));
-            }
+        if (!dataLine) {
+            cartLinesChange.type = 'addCartLine';
+            cartLinesChange.merchandiseId = dataVariantId;
+            cartLinesChange.attributes = [ { key: "_shipping_methods", value: JSON.stringify(addressShippingMethods) } ];
+        } else {
+            cartLinesChange.type = 'updateCartLine';
+            cartLinesChange.id = dataLine.id;
+            cartLinesChange.attributes = [ ...dataLine.attributes, { key: "_shipping_methods", value: JSON.stringify(addressShippingMethods) } ];
+         }
 
-        }
-
-        console.log(addressShippingMethods, additionalAddresses);
-
-        for (let i = 0; i < additionalAddresses.length; i++) {
-
-            const addr = additionalAddresses[i];
-
-            if (!addressShippingMethods[addr.id]) continue;
-
-            let lineItems = shippableCartLines.filter(line => addr.items.includes(line.id));
-
-            for (let j = 0; j < lineItems.length; j++) {
-                cartLineChanges.push(({
-                    type: 'updateCartLine',
-                    id: lineItems[j].id,
-                    attributes: [ ...primaryAddressLineItems[j].attributes,  { key: "_shipping_rate", value: `${addr.id}:${addressShippingMethods[addr.id]}` } ]
-                }));
-            }
-        }
-
-        console.log(cartLineChanges);
-
-        for (let i = 0; i < cartLineChanges.length; i++) {
-            let result = await applyCartLinesChange(cartLineChanges[i]);
-            console.log(result);
-        }
+        let result = await applyCartLinesChange(cartLinesChange);
+        console.log(result);
 
     }
-
 
     const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
     const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));

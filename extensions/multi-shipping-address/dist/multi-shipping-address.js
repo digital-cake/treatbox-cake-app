@@ -21025,6 +21025,7 @@ ${errorInfo.componentStack}`);
     "purchase.checkout.delivery-address.render-after",
     () => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Extension, {})
   );
+  var dataVariantId = "gid://shopify/ProductVariant/47534018953535";
   function Extension() {
     const { ui, query, shop } = useApi();
     const cartLines = useCartLines();
@@ -21040,7 +21041,6 @@ ${errorInfo.componentStack}`);
     const applyAttributeChange = useApplyAttributeChange();
     const applyCartLinesChange = useApplyCartLinesChange();
     (0, import_react37.useEffect)(() => {
-      console.log("Oi");
       query(
         `query {
               shop {
@@ -21076,6 +21076,21 @@ ${errorInfo.componentStack}`);
         }
       }
     }, [attributes]);
+    (0, import_react37.useEffect)(() => {
+      for (let i = 0; i < cartLines.length; i++) {
+        if (cartLines[i].merchandise.id != dataVariantId)
+          continue;
+        const shippingMethodAttr = cartLines[i].attributes.find((attr) => attr.key == "_shipping_methods");
+        if (!shippingMethodAttr)
+          break;
+        try {
+          const shippingMethodData = JSON.parse(shippingMethodAttr.value);
+          setSelectedShippingMethods(shippingMethodData);
+        } catch (err) {
+          break;
+        }
+      }
+    }, [cartLines]);
     useBuyerJourneyIntercept(({ canBlockProgress }) => {
       if (canBlockProgress) {
       }
@@ -21184,37 +21199,21 @@ ${errorInfo.componentStack}`);
     }
     function applyShippingMethodLineItemProps(addressShippingMethods, additionalAddresses2) {
       return __async(this, null, function* () {
-        const cartLineChanges = [];
-        const addressAssignedCartLines2 = additionalAddresses2.map((addr) => addr.items).flat(1);
-        let primaryAddressLineItems2 = shippableCartLines.filter((line) => !addressAssignedCartLines2.includes(line.id));
-        if (addressShippingMethods.primary && primaryAddressLineItems2.length > 0) {
-          for (let i = 0; i < primaryAddressLineItems2.length; i++) {
-            cartLineChanges.push({
-              type: "updateCartLine",
-              id: primaryAddressLineItems2[i].id,
-              attributes: [...primaryAddressLineItems2[i].attributes, { key: "_shipping_rate", value: `primary:${addressShippingMethods.primary}` }]
-            });
-          }
+        const cartLinesChange = {
+          quantity: 1
+        };
+        const dataLine = cartLines.find((line) => line.merchandise.id == dataVariantId);
+        if (!dataLine) {
+          cartLinesChange.type = "addCartLine";
+          cartLinesChange.merchandiseId = dataVariantId;
+          cartLinesChange.attributes = [{ key: "_shipping_methods", value: JSON.stringify(addressShippingMethods) }];
+        } else {
+          cartLinesChange.type = "updateCartLine";
+          cartLinesChange.id = dataLine.id;
+          cartLinesChange.attributes = [...dataLine.attributes, { key: "_shipping_methods", value: JSON.stringify(addressShippingMethods) }];
         }
-        console.log(addressShippingMethods, additionalAddresses2);
-        for (let i = 0; i < additionalAddresses2.length; i++) {
-          const addr = additionalAddresses2[i];
-          if (!addressShippingMethods[addr.id])
-            continue;
-          let lineItems = shippableCartLines.filter((line) => addr.items.includes(line.id));
-          for (let j = 0; j < lineItems.length; j++) {
-            cartLineChanges.push({
-              type: "updateCartLine",
-              id: lineItems[j].id,
-              attributes: [...primaryAddressLineItems2[j].attributes, { key: "_shipping_rate", value: `${addr.id}:${addressShippingMethods[addr.id]}` }]
-            });
-          }
-        }
-        console.log(cartLineChanges);
-        for (let i = 0; i < cartLineChanges.length; i++) {
-          let result = yield applyCartLinesChange(cartLineChanges[i]);
-          console.log(result);
-        }
+        let result = yield applyCartLinesChange(cartLinesChange);
+        console.log(result);
       });
     }
     const addressAssignedCartLines = additionalAddresses.map((addr) => addr.items).flat(1);
@@ -21393,3 +21392,4 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
+//# sourceMappingURL=multi-shipping-address.js.map
