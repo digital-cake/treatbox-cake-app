@@ -80,14 +80,36 @@ export default function AddressEditModal(props) {
         onSave(address);
     }
 
-    function onLineItemPress(lineId) {
+    function onLineItemPress(line) {
+
+        const lineId = line.id;
+        let boxId = null;
+        let ts = null;
+
+        const tsAttr = line.attributes.find(attr => attr.key == '_ts');
+
+        if (tsAttr) {
+            ts = tsAttr.value;
+        }
+
+        if (Array.isArray(line.lineComponents) && line.lineComponents.length > 0) {
+
+            for (let i = 0; i < line.lineComponents.length; i++) {
+                const boxAttr = line.lineComponents[i].attributes.find(attr => attr.key == '_id' || attr.value == '__box_id');
+
+                if (!boxAttr) continue;
+
+                boxId = boxAttr.value;
+                break;
+            }
+        }
 
         const items = Array.isArray(address.items) ? [ ...address.items ] : [];
 
-        const index = items.indexOf(lineId);
+        const index = items.findIndex(item => item.lineId == lineId);
 
         if (index === -1) {
-            items.push(lineId);
+            items.push({ lineId, boxId, ts });
         } else {
             items.splice(index, 1);
         }
@@ -100,7 +122,7 @@ export default function AddressEditModal(props) {
 
     function lineItemAssignedToOtherAddress(lineId) {
         for (let i = 0; i < otherAddresses.length; i++) {
-            if (!otherAddresses[i].items.includes(lineId)) continue;
+            if (!otherAddresses[i].items.find(item => item.lineId == lineId)) continue;
             return true;
         }
 
@@ -181,7 +203,7 @@ export default function AddressEditModal(props) {
                                                         cornerRadius="base"
                                                         padding="base"
                                                         key={line.id}
-                                                        onPress={() => onLineItemPress(line.id)}>
+                                                        onPress={() => onLineItemPress(line)}>
                                                 <InlineLayout columns={['80%', 'fill']}
                                                             blockAlignment="center"
                                                             spacing="base">
@@ -194,8 +216,8 @@ export default function AddressEditModal(props) {
                                                     </InlineStack>
 
                                                     <View inlineAlignment="end">
-                                                        <Checkbox checked={address?.items?.includes(line.id)}
-                                                                  onChange={() => onLineItemPress(line.id)} />
+                                                        <Checkbox checked={address?.items?.find(item => item.lineId == line.id)}
+                                                                  onChange={() => onLineItemPress(line)} />
                                                     </View>
 
 

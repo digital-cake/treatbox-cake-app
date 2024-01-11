@@ -70,11 +70,23 @@ Route::get('/api/auth/callback', function (Request $request) {
     $shop = Utils::sanitizeShopDomain($request->query('shop'));
 
     $response = Registry::register('/api/webhooks', Topics::APP_UNINSTALLED, $shop, $session->getAccessToken());
+
     if ($response->isSuccess()) {
         Log::debug("Registered APP_UNINSTALLED webhook for shop $shop");
     } else {
         Log::error(
             "Failed to register APP_UNINSTALLED webhook for shop $shop with response body: " .
+                print_r($response->getBody(), true)
+        );
+    }
+
+    $response = Registry::register('/api/webhooks', Topics::ORDERS_CREATE, $shop, $session->getAccessToken());
+
+    if ($response->isSuccess()) {
+        Log::debug("Registered ORDERS_CREATE webhook for shop $shop");
+    } else {
+        Log::error(
+            "Failed to register ORDERS_CREATE webhook for shop $shop with response body: " .
                 print_r($response->getBody(), true)
         );
     }
@@ -161,6 +173,8 @@ Route::controller(ShopifyCartTransformController::class)->group(function() {
 Route::post('/api/webhooks', function (Request $request) {
     try {
         $topic = $request->header(HttpHeaders::X_SHOPIFY_TOPIC, '');
+
+        //dd(base64_encode(hash_hmac('sha256', $request->getContent(), Context::$API_SECRET_KEY, true)));
 
         $response = Registry::process($request->header(), $request->getContent());
         if (!$response->isSuccess()) {

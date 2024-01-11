@@ -48,7 +48,7 @@ function Extension() {
     const {ui, query, shop} = useApi();
 
     const cartLines = useCartLines();
-    const shippableCartLines  = cartLines.filter(line => line.merchandise.requiresShipping);
+    const shippableCartLines  = cartLines.filter(line => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);
 
     const [shippingCountries, setShippingCountries] = useState([]);
     const [additionalAddressEdit, setAdditionalAddressEdit] = useState({});
@@ -98,7 +98,7 @@ function Extension() {
                 for (let j = 0; j < addresses.length; j++) {
                     const newItems = [];
                     for (let k = 0; k < addresses[j].items.length; k++) {
-                        const index = shippableCartLines.findIndex(item => item.id == addresses[j].items[k]);
+                        const index = shippableCartLines.findIndex(item => item.id == addresses[j].items[k].lineId);
                         if (index === -1) continue;
                         newItems.push(addresses[j].items[k]);
                     }
@@ -112,9 +112,13 @@ function Extension() {
             }
         }
 
+        console.log("ATTRIBUTES", attributes);
+
     }, [attributes]);
 
     useEffect(() => {
+
+        console.log("Lines", cartLines);
 
         for (let i = 0; i < cartLines.length; i++) {
             if (cartLines[i].merchandise.id != dataVariantId) continue;
@@ -199,6 +203,8 @@ function Extension() {
             newAdditialAddresses[currentAddressIndex] = additionalAddress;
         }
 
+        console.log(JSON.stringify(newAdditialAddresses, null, "\t"));
+
         await applyAttributeChange({
             type: 'updateAttribute',
             key: '__additional_addresses',
@@ -273,11 +279,10 @@ function Extension() {
     function onDeliveryMethodChange(addressId, value) {
         const nextSelectedShippingMethods = { ...selectedShippingMethods, [addressId]: value };
         setSelectedShippingMethods(nextSelectedShippingMethods);
-        applyShippingMethodLineItemProps(nextSelectedShippingMethods, additionalAddresses);
+        applyShippingMethodLineItemProps(nextSelectedShippingMethods);
     }
 
-    async function applyShippingMethodLineItemProps(addressShippingMethods, additionalAddresses) {
-
+    async function applyShippingMethodLineItemProps(addressShippingMethods) {
 
         const cartLinesChange = {
             quantity: 1
@@ -300,7 +305,8 @@ function Extension() {
 
     }
 
-    const addressAssignedCartLines = additionalAddresses.map(addr => addr.items).flat(1);
+    const addressAssignedCartLines = additionalAddresses.map(addr => addr.items.map(item => item.lineId)).flat(1);
+
     const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
 
     if (shippableCartLines.length < 2) return null;
@@ -386,6 +392,7 @@ function Extension() {
 
         <View>
             <Heading>Additional shipping addresses</Heading>
+            <Text>Ship selected items in your order to an additional locations.</Text>
         </View>
 
         {
@@ -442,14 +449,14 @@ function Extension() {
                                 <View id={`selected-items-${addr.id}`}>
                                     <List spacing="base">
                                         {
-                                            addr.items.map(itemId => {
+                                            addr.items.map(item => {
 
-                                                const lineItem = shippableCartLines.find(line => line.id == itemId);
+                                                const lineItem = shippableCartLines.find(line => line.id == item.lineId);
 
                                                 if (!lineItem) return null;
 
                                                 return (
-                                                    <ListItem key={itemId}>
+                                                    <ListItem key={lineItem.id}>
                                                         <Text size="small">{lineItem.merchandise.title}</Text>
                                                     </ListItem>
                                                 )

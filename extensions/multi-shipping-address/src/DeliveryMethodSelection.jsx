@@ -11,6 +11,7 @@ import {
     View,
     Choice
 } from "@shopify/ui-extensions-react/checkout";
+
 import { ChoiceList } from "@shopify/ui-extensions/checkout";
 
 export default function DeliveryMethodSelection({ countryCode, shop, onChange, selected }) {

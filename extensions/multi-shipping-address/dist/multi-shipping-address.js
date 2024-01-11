@@ -20822,11 +20822,27 @@ ${errorInfo.componentStack}`);
       }
       onSave(address);
     }
-    function onLineItemPress(lineId) {
+    function onLineItemPress(line) {
+      const lineId = line.id;
+      let boxId = null;
+      let ts = null;
+      const tsAttr = line.attributes.find((attr) => attr.key == "_ts");
+      if (tsAttr) {
+        ts = tsAttr.value;
+      }
+      if (Array.isArray(line.lineComponents) && line.lineComponents.length > 0) {
+        for (let i = 0; i < line.lineComponents.length; i++) {
+          const boxAttr = line.lineComponents[i].attributes.find((attr) => attr.key == "_id" || attr.value == "__box_id");
+          if (!boxAttr)
+            continue;
+          boxId = boxAttr.value;
+          break;
+        }
+      }
       const items = Array.isArray(address.items) ? [...address.items] : [];
-      const index = items.indexOf(lineId);
+      const index = items.findIndex((item) => item.lineId == lineId);
       if (index === -1) {
-        items.push(lineId);
+        items.push({ lineId, boxId, ts });
       } else {
         items.splice(index, 1);
       }
@@ -20836,7 +20852,7 @@ ${errorInfo.componentStack}`);
     }
     function lineItemAssignedToOtherAddress(lineId) {
       for (let i = 0; i < otherAddresses.length; i++) {
-        if (!otherAddresses[i].items.includes(lineId))
+        if (!otherAddresses[i].items.find((item) => item.lineId == lineId))
           continue;
         return true;
       }
@@ -20944,7 +20960,7 @@ ${errorInfo.componentStack}`);
                       border: "base",
                       cornerRadius: "base",
                       padding: "base",
-                      onPress: () => onLineItemPress(line.id),
+                      onPress: () => onLineItemPress(line),
                       children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
                         InlineLayout2,
                         {
@@ -20967,8 +20983,8 @@ ${errorInfo.componentStack}`);
                             /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(View2, { inlineAlignment: "end", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                               Checkbox2,
                               {
-                                checked: (_a = address == null ? void 0 : address.items) == null ? void 0 : _a.includes(line.id),
-                                onChange: () => onLineItemPress(line.id)
+                                checked: (_a = address == null ? void 0 : address.items) == null ? void 0 : _a.find((item) => item.lineId == line.id),
+                                onChange: () => onLineItemPress(line)
                               }
                             ) })
                           ]
@@ -21029,7 +21045,7 @@ ${errorInfo.componentStack}`);
   function Extension() {
     const { ui, query, shop } = useApi();
     const cartLines = useCartLines();
-    const shippableCartLines = cartLines.filter((line) => line.merchandise.requiresShipping);
+    const shippableCartLines = cartLines.filter((line) => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);
     const [shippingCountries, setShippingCountries] = (0, import_react37.useState)([]);
     const [additionalAddressEdit, setAdditionalAddressEdit] = (0, import_react37.useState)({});
     const [addressSaving, setAddressSaving] = (0, import_react37.useState)(false);
@@ -21062,7 +21078,7 @@ ${errorInfo.componentStack}`);
           for (let j = 0; j < addresses.length; j++) {
             const newItems = [];
             for (let k = 0; k < addresses[j].items.length; k++) {
-              const index = shippableCartLines.findIndex((item) => item.id == addresses[j].items[k]);
+              const index = shippableCartLines.findIndex((item) => item.id == addresses[j].items[k].lineId);
               if (index === -1)
                 continue;
               newItems.push(addresses[j].items[k]);
@@ -21075,8 +21091,10 @@ ${errorInfo.componentStack}`);
           break;
         }
       }
+      console.log("ATTRIBUTES", attributes);
     }, [attributes]);
     (0, import_react37.useEffect)(() => {
+      console.log("Lines", cartLines);
       for (let i = 0; i < cartLines.length; i++) {
         if (cartLines[i].merchandise.id != dataVariantId)
           continue;
@@ -21133,6 +21151,7 @@ ${errorInfo.componentStack}`);
         } else {
           newAdditialAddresses[currentAddressIndex] = additionalAddress;
         }
+        console.log(JSON.stringify(newAdditialAddresses, null, "	"));
         yield applyAttributeChange({
           type: "updateAttribute",
           key: "__additional_addresses",
@@ -21195,9 +21214,9 @@ ${errorInfo.componentStack}`);
     function onDeliveryMethodChange(addressId, value) {
       const nextSelectedShippingMethods = __spreadProps(__spreadValues({}, selectedShippingMethods), { [addressId]: value });
       setSelectedShippingMethods(nextSelectedShippingMethods);
-      applyShippingMethodLineItemProps(nextSelectedShippingMethods, additionalAddresses);
+      applyShippingMethodLineItemProps(nextSelectedShippingMethods);
     }
-    function applyShippingMethodLineItemProps(addressShippingMethods, additionalAddresses2) {
+    function applyShippingMethodLineItemProps(addressShippingMethods) {
       return __async(this, null, function* () {
         const cartLinesChange = {
           quantity: 1
@@ -21216,7 +21235,7 @@ ${errorInfo.componentStack}`);
         console.log(result);
       });
     }
-    const addressAssignedCartLines = additionalAddresses.map((addr) => addr.items).flat(1);
+    const addressAssignedCartLines = additionalAddresses.map((addr) => addr.items.map((item) => item.lineId)).flat(1);
     const primaryAddressLineItems = shippableCartLines.filter((line) => !addressAssignedCartLines.includes(line.id));
     if (shippableCartLines.length < 2)
       return null;
@@ -21296,7 +21315,10 @@ ${errorInfo.componentStack}`);
         }
       ),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(BlockSpacer2, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Heading2, { children: "Additional shipping addresses" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(View2, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Heading2, { children: "Additional shipping addresses" }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: "Ship selected items in your order to an additional locations." })
+      ] }),
       additionalAddresses.map((addr) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
         BlockLayout2,
         {
@@ -21364,11 +21386,11 @@ ${errorInfo.componentStack}`);
                       ] })
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: addr.items.map((itemId) => {
-                    const lineItem = shippableCartLines.find((line) => line.id == itemId);
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: addr.items.map((item) => {
+                    const lineItem = shippableCartLines.find((line) => line.id == item.lineId);
                     if (!lineItem)
                       return null;
-                    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, itemId);
+                    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
                   }) }) })
                 ]
               }
@@ -21392,4 +21414,3 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
-//# sourceMappingURL=multi-shipping-address.js.map
