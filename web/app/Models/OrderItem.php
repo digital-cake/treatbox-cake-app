@@ -18,4 +18,9 @@ class OrderItem extends Model
         return $this->hasMany(OrderItem::class, 'parent', 'shopify_line_id');
     }
 
+    public function parentItem()
+    {
+        return $this->belongsTo(OrderItem::class, 'parent', 'shopify_line_id');
+    }
+
 }

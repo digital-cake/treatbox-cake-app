@@ -4,11 +4,13 @@ namespace App\Lib;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Jobs\ClickAndDropOrderImport;
 use App\Models\ShippingRate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
+
 
 class OrderProcessor
 {
@@ -18,7 +20,6 @@ class OrderProcessor
         $line_items = self::extractLineItems($order);
         $shipping_addresses = self::extractShippingAddresses($order, $line_items);
 
-        $special_instructions = self::extractSpecialInstructions($order['line_items']);
 
         $shipping_rates = ShippingRate::all();
 
@@ -41,8 +42,6 @@ class OrderProcessor
 
             $subtotal = 0;
 
-
-
             $incoming_order->fill([
                 'shop' => $shop,
                 'shopify_id' => $order['id'],
@@ -51,7 +50,6 @@ class OrderProcessor
                 'shipping_cost_charged' => $shipping_cost,
                 'currency_code' => $order['total_price_set']['presentment_money']['currency_code'],
                 'order_date' => Carbon::parse($order['processed_at'])->format('Y-m-d H:i:s'),
-                'special_instructions' => $special_instructions,
                 'selected_shipping_method' => $rate_name,
                 'recipient_name' => $shipping_address['name'],
                 'recipient_address1' => $shipping_address['address1'],
@@ -105,12 +103,14 @@ class OrderProcessor
             $incoming_order->fill([
                 'subtotal' => $subtotal,
                 'total' => $subtotal + $shipping_cost,
+                'special_instructions' => self::extractSpecialInstructions($order_items)
             ]);
 
             $incoming_order->save();
             $incoming_order->items()->saveMany($incoming_items);
-        }
 
+            ClickAndDropOrderImport::dispatch($incoming_order);
+        }
 
     }
 
@@ -245,76 +245,89 @@ class OrderProcessor
         return $shipping_addresses;
     }
 
-    private static function extractSpecialInstructions(array $line_items)
+    private static function extractSpecialInstructions(Collection $line_items)
     {
         $special_instruction_lines = [];
 
-        $delivery_preference_line_added = false;
-        $date_of_birth_added = false;
-
         foreach($line_items as $line_item) {
+            $line_special_instructions = self::extractSpecialInstructionsFromLineItem($line_item);
+            $special_instruction_lines = [ ...$special_instruction_lines, ...$line_special_instructions ];
 
-            $message_props = Arr::where($line_item['properties'], function ($prop) {
-                return Str::contains(Str::lower($prop['name']), 'message');
-            }, null);
-
-            foreach($message_props as $index => $prop) {
-                if (!empty($prop['value'])) {
-                    $special_instruction_lines[] = "{$prop['name']}: {$prop['value']}";
+            if (isset($line_item['children']) && is_array($line_item['children'])) {
+                foreach($line_item['children'] as $child_line_item) {
+                    $line_special_instructions = self::extractSpecialInstructionsFromLineItem($child_line_item);
+                    $special_instruction_lines = [ ...$special_instruction_lines, ...$line_special_instructions ];
                 }
-            }
-
-            $date_prop = Arr::first($line_item['properties'], function ($prop, $key) {
-                return Str::contains(Str::lower($prop['name']), 'date');
-            }, null);
-
-
-            if ($date_prop) {
-                $special_instruction_lines[] = "{$date_prop['name']}: {$date_prop['value']}";
-            }
-
-            $delivery_preference = Arr::first($line_item['properties'], function($prop) {
-                return $prop['name'] == 'Delivery Option';
-            });
-
-            if ($delivery_preference && $delivery_preference_line_added) {
-                $special_instruction_lines[] = "Delivery Preference: {$delivery_preference['value']}";
-                $delivery_preference_line_added = true;
-            }
-
-            $date_of_birth_field_prop = Arr::first($line_item['properties'], function($prop) {
-                return $prop['name'] == '_dob_field_prop';
-            });
-
-            $date_of_birth_field_prop = $date_of_birth_field_prop ? $date_of_birth_field_prop['value'] : "DOB";
-
-            $date_of_birth = Arr::first($line_item['properties'], function($prop) use($date_of_birth_field_prop) {
-                return $prop['name'] == $date_of_birth_field_prop;
-            });
-
-            if ($date_of_birth && !$date_of_birth_added) {
-                $special_instruction_lines[] = "{$date_of_birth_field_prop}: {$date_of_birth['value']}";
-                $date_of_birth_added = true;
-            }
-
-            $do_not_open_until_field_prop = Arr::first($line_item['properties'], function($prop) {
-                return strtolower($prop['name']) == 'do not open until sticker';
-            });
-
-            if ($do_not_open_until_field_prop) {
-                $special_instruction_lines[] = "Do not open until sticker: {$do_not_open_until_field_prop['value']}";
-            }
-
-            $shipping_by_field_prop = Arr::first($line_item['properties'], function($prop) {
-                return strtolower($prop['name']) == 'shipping by';
-            });
-
-            if ($shipping_by_field_prop) {
-                $special_instruction_lines[] = "Shipping by: {$shipping_by_field_prop['value']}";
             }
         }
 
         return implode("\n\n", $special_instruction_lines);
+    }
+
+    private static function extractSpecialInstructionsFromLineItem(array $line_item)
+    {
+
+        $special_instruction_lines = [];
+
+        $message_props = Arr::where($line_item['properties'], function ($prop) {
+            return Str::contains(Str::lower($prop['name']), 'message');
+        }, null);
+
+        foreach($message_props as $index => $prop) {
+            if (!empty($prop['value'])) {
+                $special_instruction_lines["{$line_item['id']}_message_{$index}"] = "{$prop['name']}: {$prop['value']}";
+            }
+        }
+
+        $date_prop = Arr::first($line_item['properties'], function ($prop, $key) {
+            return Str::contains(Str::lower($prop['name']), 'date');
+        }, null);
+
+
+        if ($date_prop) {
+            $special_instruction_lines["{$line_item['id']}_date"] = "{$date_prop['name']}: {$date_prop['value']}";
+        }
+
+        $delivery_preference = Arr::first($line_item['properties'], function($prop) {
+            return $prop['name'] == 'Delivery Option';
+        });
+
+        if ($delivery_preference) {
+            $special_instruction_lines['delivery_preference'] = "Delivery Preference: {$delivery_preference['value']}";
+        }
+
+        $date_of_birth_field_prop = Arr::first($line_item['properties'], function($prop) {
+            return $prop['name'] == '_dob_field_prop';
+        });
+
+        $date_of_birth_field_prop = $date_of_birth_field_prop ? $date_of_birth_field_prop['value'] : "DOB";
+
+        $date_of_birth = Arr::first($line_item['properties'], function($prop) use($date_of_birth_field_prop) {
+            return $prop['name'] == $date_of_birth_field_prop;
+        });
+
+        if ($date_of_birth) {
+            $special_instruction_lines['dob'] = "{$date_of_birth_field_prop}: {$date_of_birth['value']}";
+        }
+
+        $do_not_open_until_field_prop = Arr::first($line_item['properties'], function($prop) {
+            return strtolower($prop['name']) == 'do not open until sticker';
+        });
+
+        if ($do_not_open_until_field_prop) {
+            $special_instruction_lines["{$line_item['id']}_do_not_open"] = "Do not open until sticker: {$do_not_open_until_field_prop['value']}";
+        }
+
+        $shipping_by_field_prop = Arr::first($line_item['properties'], function($prop) {
+            return strtolower($prop['name']) == 'shipping by';
+        });
+
+        if ($shipping_by_field_prop) {
+            $special_instruction_lines["{$line_item['id']}_shipping_date"] = "Shipping by: {$shipping_by_field_prop['value']}";
+        }
+
+        return $special_instruction_lines;
+
     }
 
 }
