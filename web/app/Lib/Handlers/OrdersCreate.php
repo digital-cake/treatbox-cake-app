@@ -23,6 +23,7 @@ class OrdersCreate implements Handler
             OrderProcessor::process($shop, $order);
         } catch(Exception $e) {
             Log::error($e->getMessage());
+            Log::channel('slack')->error("OrdersCreate Webhook Faile for {$order['name']}", ['exception' => $e]);
         }
 
     }
