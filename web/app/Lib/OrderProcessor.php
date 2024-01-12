@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
 
-
 class OrderProcessor
 {
 
@@ -34,7 +33,7 @@ class OrderProcessor
 
         foreach($shipping_addresses as $index => $shipping_address) {
 
-            $channel_ref = "{$order['name']}-{$index}";
+            $channel_ref = "TEST_{$order['name']}_{$index}";
 
             $count = Order::where('channel_reference', $channel_ref)->count();
 

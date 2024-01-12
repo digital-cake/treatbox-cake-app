@@ -32,6 +32,7 @@ class Order extends Model
         'billing_postcode',
         'billing_country_code',
         'tracking_number',
+        'shipped_on',
         'fulfilled',
         'special_instructions',
         'selected_shipping_method'

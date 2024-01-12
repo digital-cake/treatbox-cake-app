@@ -39,6 +39,7 @@ class CreateOrdersTable extends Migration
             $table->text('billing_postcode')->nullable();
             $table->text('billing_country_code')->nullable();
             $table->string('tracking_number', 255)->nullable();
+            $table->dateTime('shipped_on')->nullable();
             $table->boolean('fulfilled')->default(0);
             $table->longText('special_instructions')->nullable();
             $table->text('selected_shipping_method', 255);
