@@ -34,6 +34,12 @@ class OrderProcessor
 
         foreach($shipping_addresses as $index => $shipping_address) {
 
+            $channel_ref = "{$order['name']}-{$index}";
+
+            $count = Order::where('channel_reference', $channel_ref)->count();
+
+            if ($count > 0) continue;
+
             $incoming_order = new Order;
 
             $shipping_rate = $shipping_rates->firstWhere('id', $shipping_address['shipping_rate_id']);
@@ -46,7 +52,7 @@ class OrderProcessor
                 'shop' => $shop,
                 'shopify_id' => $order['id'],
                 'name' => $order['name'],
-                'channel_reference' => "TEST-{$order['name']}-{$index}",
+                'channel_reference' => $channel_ref,
                 'shipping_cost_charged' => $shipping_cost,
                 'currency_code' => $order['total_price_set']['presentment_money']['currency_code'],
                 'order_date' => Carbon::parse($order['processed_at'])->format('Y-m-d H:i:s'),
