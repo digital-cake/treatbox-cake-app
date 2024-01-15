@@ -16,7 +16,9 @@ import {
     Pressable,
     ProductThumbnail,
     BlockStack,
-    Checkbox
+    Checkbox,
+    List,
+    ListItem
 } from '@shopify/ui-extensions-react/checkout';
 
 import DeliveryMethodSelection from './DeliveryMethodSelection.jsx';
@@ -212,7 +214,37 @@ export default function AddressEditModal(props) {
                                                                 columns="auto"
                                                                 blockAlignment="center">
                                                         <ProductThumbnail source={line.merchandise.image.url} opacity />
+
+                                                        <View>
                                                         <Text key={line.id}>{line.merchandise.title}</Text>
+                                                        {
+                                                            line.lineComponents && line.lineComponents.length > 0 && (
+                                                                <>
+                                                                    <BlockSpacer />
+                                                                    <List>
+                                                                        {
+                                                                            line.lineComponents.map((componentLine, index) => {
+
+                                                                                if (componentLine.merchandise.id == line.merchandise.id) return null;
+
+                                                                                return (
+                                                                                    <ListItem key={`line-${line.id}-${index}`}>
+                                                                                        {componentLine.merchandise.title}
+                                                                                    </ListItem>
+                                                                                )
+
+                                                                            })
+                                                                        }
+
+                                                                    </List>
+                                                                </>
+
+                                                            )
+                                                        }
+                                                        </View>
+
+
+
                                                     </InlineStack>
 
                                                     <View inlineAlignment="end">

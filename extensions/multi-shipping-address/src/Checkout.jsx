@@ -429,7 +429,7 @@ function Extension() {
                     {
                         addr.items.length > 0 && (
                             <Disclosure onToggle={setOpenDisclosures}
-                            spacing="base">
+                                        spacing="base">
                                 <Pressable toggles={`selected-items-${addr.id}`}
                                             kind="plain">
 

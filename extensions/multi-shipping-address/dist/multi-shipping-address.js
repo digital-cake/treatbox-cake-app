@@ -2495,7 +2495,7 @@
           var HostPortal = 4;
           var HostComponent = 5;
           var HostText = 6;
-          var Fragment = 7;
+          var Fragment2 = 7;
           var Mode = 8;
           var ContextConsumer = 9;
           var ContextProvider = 10;
@@ -2635,7 +2635,7 @@
                 return "DehydratedFragment";
               case ForwardRef:
                 return getWrappedName$1(type, type.render, "ForwardRef");
-              case Fragment:
+              case Fragment2:
                 return "Fragment";
               case HostComponent:
                 return type;
@@ -7053,7 +7053,7 @@
               }
             }
             function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-              if (current2 === null || current2.tag !== Fragment) {
+              if (current2 === null || current2.tag !== Fragment2) {
                 var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
                 created.return = returnFiber;
                 return created;
@@ -7456,7 +7456,7 @@
                 if (child.key === key) {
                   var elementType = element.type;
                   if (elementType === REACT_FRAGMENT_TYPE) {
-                    if (child.tag === Fragment) {
+                    if (child.tag === Fragment2) {
                       deleteRemainingChildren(returnFiber, child.sibling);
                       var existing = useFiber(child, element.props.children);
                       existing.return = returnFiber;
@@ -11633,7 +11633,7 @@
                 var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
                 return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
               }
-              case Fragment:
+              case Fragment2:
                 return updateFragment(current2, workInProgress2, renderLanes2);
               case Mode:
                 return updateMode(current2, workInProgress2, renderLanes2);
@@ -12074,7 +12074,7 @@
               case SimpleMemoComponent:
               case FunctionComponent:
               case ForwardRef:
-              case Fragment:
+              case Fragment2:
               case Mode:
               case Profiler:
               case ContextConsumer:
@@ -16840,7 +16840,7 @@
             return fiber;
           }
           function createFiberFromFragment(elements, mode, lanes, key) {
-            var fiber = createFiber(Fragment, elements, key, mode);
+            var fiber = createFiber(Fragment2, elements, key, mode);
             fiber.lanes = lanes;
             return fiber;
           }
@@ -20713,7 +20713,7 @@ ${errorInfo.componentStack}`);
     const [loading, setLoading] = (0, import_react35.useState)(false);
     (0, import_react35.useEffect)(() => {
       setLoading(true);
-      fetch(`https://63ec-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
+      fetch(`https://3816-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
         setRates(response.rates);
         setLoading(false);
       }).catch((err) => {
@@ -20976,7 +20976,17 @@ ${errorInfo.componentStack}`);
                                 blockAlignment: "center",
                                 children: [
                                   /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ProductThumbnail2, { source: line.merchandise.image.url, opacity: true }),
-                                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: line.merchandise.title }, line.id)
+                                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(View2, { children: [
+                                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: line.merchandise.title }, line.id),
+                                    line.lineComponents && line.lineComponents.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+                                      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, {}),
+                                      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(List2, { children: line.lineComponents.map((componentLine, index) => {
+                                        if (componentLine.merchandise.id == line.merchandise.id)
+                                          return null;
+                                        return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ListItem2, { children: componentLine.merchandise.title }, `line-${line.id}-${index}`);
+                                      }) })
+                                    ] })
+                                  ] })
                                 ]
                               }
                             ),
@@ -21414,3 +21424,4 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
+//# sourceMappingURL=multi-shipping-address.js.map

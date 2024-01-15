@@ -20,6 +20,7 @@ use Shopify\Webhooks\Registry;
 use Shopify\Webhooks\Topics;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ActiveCarrierServiceController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShippingRateController;
 use App\Http\Controllers\ShopifyCarrierServiceCallbackController;
 use App\Http\Controllers\ShopifyCartTransformController;
@@ -168,6 +169,10 @@ Route::controller(ShopifyCartTransformController::class)->group(function() {
     Route::get('/api/cart-transform/{function_name}', 'get');
     Route::post('/api/cart-transform/deactivate', 'deactivate');
     Route::post('/api/cart-transform/{function_name}/activate', 'activate');
+});
+
+Route::controller(OrderController::class)->group(function() {
+    Route::get('/api/orders', 'list');
 });
 
 Route::post('/api/webhooks', function (Request $request) {

@@ -38,8 +38,15 @@ class Order extends Model
         'selected_shipping_method'
     ];
 
+    public $appends = ['item_count'];
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getItemCountAttribute()
+    {
+        return $this->items()->count();
     }
 }
