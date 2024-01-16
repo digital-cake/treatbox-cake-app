@@ -57,6 +57,7 @@ class ClickAndDropGetTrackingNumbers extends Command
             $click_and_drop = new ClickAndDropService($click_and_drop_api_key);
 
             Order::whereNotNull('click_and_drop_id')
+            ->where('shop', $session->shop)
             ->whereNull('shipped_on')
             ->chunk(250, function($orders) use($click_and_drop) {
 

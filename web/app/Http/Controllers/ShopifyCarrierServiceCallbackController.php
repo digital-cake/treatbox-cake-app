@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
-
+use Shopify\Clients\HttpHeaders;
 use Illuminate\Support\Carbon;
 use App\Models\ShippingRate;
 
@@ -13,6 +13,10 @@ class ShopifyCarrierServiceCallbackController extends Controller
 {
     public function handle(Request $request)
     {
+
+        $shop = $request->header(HttpHeaders::X_SHOPIFY_DOMAIN, null);
+
+        if (!$shop) return [ 'rates' => [] ];
 
         $request_body = $request->all();
 
@@ -22,16 +26,36 @@ class ShopifyCarrierServiceCallbackController extends Controller
 
         $line_items = isset($rate['items']) ? collect($rate['items']) : collect([]);
 
-        $shipping_data_line_item = $line_items->first(fn ($item) => $item['variant_id'] == 47534018953535);
+        $shipping_data_line_item = $line_items->first(fn ($item) => $item['properties'] && !empty($item['properties']['_shipping_methods']));
 
-        if (!$shipping_data_line_item) return [ 'rates' => [] ];
+        if (!$shipping_data_line_item) {
+
+            $country_code = $rate['origin']['country'];
+
+            $shipping_rates = ShippingRate::where('countries', 'LIKE', "%{$country_code}%")
+                                            ->where('shop', $shop)
+                                            ->get();
+
+            return [
+                'rates' => $shipping_rates->map(function($rate) {
+                    return [
+                        'service_name' => $rate->name,
+                        'service_code' => "cake_app_{$rate->id}",
+                        'total_price' => $rate->base_rate * 100,
+                        'currency' => 'GBP',
+                        'description' => $rate->description
+                    ];
+                })
+            ];
+
+        }
 
         $shipping_methods = json_decode($shipping_data_line_item['properties']['_shipping_methods'], true);
 
         $selected_rates = collect([]);
 
         foreach($shipping_methods as $addr_id => $rate_id) {
-            $rate = ShippingRate::where('id', $rate_id)->first();
+            $rate = ShippingRate::where('id', $rate_id)->where('shop', $shop)->first();
             if (!$rate) continue;
             $selected_rates->push($rate);
         }
