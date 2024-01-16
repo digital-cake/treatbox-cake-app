@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\Session;
 use Shopify\Clients\Rest;
-
+use Illuminate\Support\Facades\Log;
 
 class FulfillClickAndDropOrders extends Command
 {
@@ -62,12 +62,19 @@ class FulfillClickAndDropOrders extends Command
                     $response = $client->get(path: "/orders/{$order->shopify_id}/fulfillment_orders.json");
                     $response_data = $response->getDecodedBody();
 
-                    dd($response_data);
+                    if ($response->getStatusCode() !== 200) {
+                        $this->error("Error fetching fulfillment orders for order {$order->shopify_id}");
+                        Log::stack(['slack', 'single'])->error( "Error fetching fulfillment orders for order {$order->shopify_id}", [
+                            "StatusCode" => $response->getStatusCode(),
+                            "Response" => json_encode($response_data, JSON_PRETTY_PRINT)
+                        ]);
+                        continue;
+                    }
 
                     $actionable_fulfillment_order = null;
 
                     if (is_array($response_data) && isset($response_data['fulfillment_orders'])) {
-                        foreach($response['fulfillment_orders'] as $fulfillment_order) {
+                        foreach($response_data['fulfillment_orders'] as $fulfillment_order) {
                             if (!in_array('create_fulfillment', $fulfillment_order['supported_actions'])) continue;
                             $actionable_fulfillment_order =  $fulfillment_order;
                             break;
@@ -89,7 +96,7 @@ class FulfillClickAndDropOrders extends Command
 
                     foreach($actionable_fulfillment_order['line_items'] as $line_item) {
                         if (in_array($line_item['line_item_id'], $line_item_ids) && $line_item['fulfillable_quantity'] > 0) {
-                            $line_items_by_fulfillment_order[0]['line_items_by_fulfillment_order'][] = [
+                            $line_items_by_fulfillment_order[0]['fulfillment_order_line_items'][] = [
                                 'id' => $line_item['id'],
                                 'quantity' => $line_item['fulfillable_quantity']
                             ];
@@ -108,24 +115,16 @@ class FulfillClickAndDropOrders extends Command
 
                     $response_data = $response->getDecodedBody();
 
-                    $location_id = config('shopify.location_id');
-                    $location_id = Str::remove('gid://shopify/Location/', $location_id);
-
-                    $fulfillment = [
-                        "location_id" => $location_id,
-                        "tracking_number" => $order->tracking_number,
-                        "line_items" => []
-                    ];
-
-
                     if (!is_array($response_data) || !isset($response_data['fulfillment'])) {
-                        $this->info($response->getStatusCode());
-                        $this->info(json_encode($response_data, JSON_PRETTY_PRINT));
                         $this->error("Error creating fulfillment for order #{$order->shopify_id}");
+                        Log::stack(['slack', 'single'])->error( "Error creating fulfillment for order #{$order->shopify_id}", [
+                            "StatusCode" => $response->getStatusCode(),
+                            "Response" => json_encode($response_data, JSON_PRETTY_PRINT)
+                        ]);
                         continue;
                     }
 
-                    $this->info("Created fulfillment for order #{$order->shopify_order_id}");
+                    $this->info("Created fulfillment for order #{$order->shopify_id}");
 
                     $order->fulfilled = 1;
                     $order->save();

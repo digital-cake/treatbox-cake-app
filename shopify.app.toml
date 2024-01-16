@@ -7,7 +7,7 @@ embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_products,write_shipping,write_orders,write_cart_transforms"
+scopes = "read_products,write_shipping,write_orders,write_cart_transforms,write_assigned_fulfillment_orders,write_merchant_managed_fulfillment_orders,write_third_party_fulfillment_orders,write_fulfillments,read_locations"
 
 [auth]
 redirect_urls = [
