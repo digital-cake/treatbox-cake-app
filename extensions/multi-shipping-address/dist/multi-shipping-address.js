@@ -19615,6 +19615,12 @@ ${errorInfo.componentStack}`);
       this.name = "CheckoutUIExtensionError";
     }
   };
+  var ScopeNotGrantedError = class extends Error {
+    constructor(...args) {
+      super(...args);
+      this.name = "ScopeNotGrantedError";
+    }
+  };
   var ExtensionHasNoMethodError = class extends Error {
     constructor(method, target) {
       super(`Cannot call '${method}()' on target '${target}'. The corresponding property was not found on the API.`);
@@ -19681,6 +19687,15 @@ ${errorInfo.componentStack}`);
       return api.applyAttributeChange;
     }
     throw new ExtensionHasNoMethodError("applyAttributeChange", api.extension.target);
+  }
+
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/shipping-address.mjs
+  function useShippingAddress() {
+    const shippingAddress = useApi().shippingAddress;
+    if (!shippingAddress) {
+      throw new ScopeNotGrantedError("Using shipping address requires having shipping address permissions granted to your app.");
+    }
+    return useSubscription(shippingAddress);
   }
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cart-lines.mjs
@@ -21063,6 +21078,7 @@ ${errorInfo.componentStack}`);
     const [additionalAddresses, setAdditionalAddresses] = (0, import_react37.useState)([]);
     const [openDisclosures, setOpenDisclosures] = (0, import_react37.useState)([]);
     const [selectedShippingMethods, setSelectedShippingMethods] = (0, import_react37.useState)({});
+    const primaryAddress = useShippingAddress();
     const attributes = useAttributes();
     const applyAttributeChange = useApplyAttributeChange();
     const applyCartLinesChange = useApplyCartLinesChange();
@@ -21104,7 +21120,6 @@ ${errorInfo.componentStack}`);
       console.log("ATTRIBUTES", attributes);
     }, [attributes]);
     (0, import_react37.useEffect)(() => {
-      console.log("Lines", cartLines);
       for (let i = 0; i < cartLines.length; i++) {
         if (cartLines[i].merchandise.id != dataVariantId)
           continue;
@@ -21174,7 +21189,17 @@ ${errorInfo.componentStack}`);
         }
         setAddressSaving(false);
         setAdditionalAddresses(newAdditialAddresses);
-        const nextSelectedShippingMethods = __spreadProps(__spreadValues({}, selectedShippingMethods), { [additionalAddress.id]: additionalAddress.shippingMethod });
+        const nextSelectedShippingMethods = __spreadValues({}, selectedShippingMethods);
+        if (additionalAddress.items.length > 0) {
+          nextSelectedShippingMethods[additionalAddress.id] = additionalAddress.shippingMethod;
+        } else if (typeof nextSelectedShippingMethods[additionalAddress.id] != "undefined") {
+          delete nextSelectedShippingMethods[additionalAddress.id];
+        }
+        const addressAssignedCartLines2 = additionalAddresses.map((addr) => addr.items.map((item) => item.lineId)).flat(1);
+        const primaryAddressLineItems2 = shippableCartLines.filter((line) => !addressAssignedCartLines2.includes(line.id));
+        if (primaryAddressLineItems2.length < 1 && typeof nextSelectedShippingMethods["primary"] != "undefined") {
+          delete nextSelectedShippingMethods["primary"];
+        }
         setSelectedShippingMethods(nextSelectedShippingMethods);
         applyShippingMethodLineItemProps(nextSelectedShippingMethods, newAdditialAddresses);
       });
@@ -21317,7 +21342,7 @@ ${errorInfo.componentStack}`);
       primaryAddressLineItems.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         DeliveryMethodSelection,
         {
-          countryCode: "GB",
+          countryCode: primaryAddress.countryCode,
           addressId: "primary",
           onChange: (value) => onDeliveryMethodChange("primary", value),
           selected: selectedShippingMethods.primary ? selectedShippingMethods.primary : "",
@@ -21325,91 +21350,113 @@ ${errorInfo.componentStack}`);
         }
       ),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(BlockSpacer2, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(View2, { children: [
+      shippableCartLines.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(View2, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Heading2, { children: "Additional shipping addresses" }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: "Ship selected items in your order to an additional locations." })
       ] }),
-      additionalAddresses.map((addr) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-        BlockLayout2,
-        {
-          rows: "auto",
-          inlineAlignment: "start",
-          border: "base",
-          padding: "base",
-          spacing: "tight",
-          cornerRadius: "base",
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-              Pressable2,
-              {
-                overlay: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-                  AddressEditModal,
-                  {
-                    id: `AddressEditModal_${addr.id}`,
-                    initialAddress: addr,
-                    onSave: onSaveAddress,
-                    onDelete: () => onDeleteAddress(addr.id),
-                    saving: addressSaving,
-                    cartLines: shippableCartLines,
-                    deleting: addressDeleting,
-                    otherAddresses: additionalAddresses.filter((additional) => additional.id != addr.id),
-                    countryOptions: countryOptions_default.filter((opt) => shippingCountries.includes(opt.value)),
-                    shop: shop.myshopifyDomain
-                  }
-                ),
-                children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: addressToString(addr) })
-              }
-            ),
-            addr.items.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-              Disclosure2,
-              {
-                onToggle: setOpenDisclosures,
-                spacing: "base",
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-                    Pressable2,
-                    {
-                      toggles: `selected-items-${addr.id}`,
-                      kind: "plain",
-                      children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(InlineLayout2, { blockAlignment: "center", spacing: "extraTight", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-                          Text2,
-                          {
-                            size: "small",
-                            appearance: "accent",
-                            children: [
-                              openDisclosures.includes(`selected-items-${addr.id}`) ? "Hide " : "Show ",
-                              addr.items.length,
-                              " item",
-                              addr.items.length != 1 ? "s" : ""
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-                          Icon2,
-                          {
-                            source: openDisclosures.includes(`selected-items-${addr.id}`) ? "chevronUp" : "chevronDown",
-                            size: "extraSmall",
-                            appearance: "accent"
-                          }
-                        )
-                      ] })
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: addr.items.map((item) => {
-                    const lineItem = shippableCartLines.find((line) => line.id == item.lineId);
-                    if (!lineItem)
-                      return null;
-                    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
-                  }) }) })
-                ]
-              }
-            )
-          ]
-        },
-        addr.id
-      )),
-      addressAssignedCartLines.length < shippableCartLines.length ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+      shippableCartLines.length > 1 && additionalAddresses.map((addr) => {
+        const editModal = /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+          AddressEditModal,
+          {
+            id: `AddressEditModal_${addr.id}`,
+            initialAddress: addr,
+            onSave: onSaveAddress,
+            onDelete: () => onDeleteAddress(addr.id),
+            saving: addressSaving,
+            cartLines: shippableCartLines,
+            deleting: addressDeleting,
+            otherAddresses: additionalAddresses.filter((additional) => additional.id != addr.id),
+            countryOptions: countryOptions_default.filter((opt) => shippingCountries.includes(opt.value)),
+            shop: shop.myshopifyDomain
+          }
+        );
+        return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+          InlineLayout2,
+          {
+            padding: "base",
+            border: "base",
+            spacing: "base",
+            columns: ["fill", 70],
+            blockAlignment: "start",
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+                BlockLayout2,
+                {
+                  rows: "auto",
+                  inlineAlignment: "start",
+                  spacing: "tight",
+                  cornerRadius: "base",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+                      Pressable2,
+                      {
+                        overlay: editModal,
+                        children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: addressToString(addr) })
+                      }
+                    ),
+                    addr.items.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+                      Disclosure2,
+                      {
+                        onToggle: setOpenDisclosures,
+                        spacing: "base",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+                            Pressable2,
+                            {
+                              toggles: `selected-items-${addr.id}`,
+                              kind: "plain",
+                              children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(InlineLayout2, { blockAlignment: "center", spacing: "extraTight", children: [
+                                /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+                                  Text2,
+                                  {
+                                    size: "small",
+                                    appearance: "accent",
+                                    children: [
+                                      openDisclosures.includes(`selected-items-${addr.id}`) ? "Hide " : "Show ",
+                                      addr.items.length,
+                                      " item",
+                                      addr.items.length != 1 ? "s" : ""
+                                    ]
+                                  }
+                                ),
+                                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+                                  Icon2,
+                                  {
+                                    source: openDisclosures.includes(`selected-items-${addr.id}`) ? "chevronUp" : "chevronDown",
+                                    size: "extraSmall",
+                                    appearance: "accent"
+                                  }
+                                )
+                              ] })
+                            }
+                          ),
+                          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: addr.items.map((item) => {
+                            const lineItem = shippableCartLines.find((line) => line.id == item.lineId);
+                            if (!lineItem)
+                              return null;
+                            return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
+                          }) }) })
+                        ]
+                      }
+                    )
+                  ]
+                },
+                addr.id
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+                Button2,
+                {
+                  overlay: editModal,
+                  kind: "secondary",
+                  padding: "tight",
+                  children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { children: "Edit" })
+                }
+              )
+            ]
+          }
+        );
+      }),
+      shippableCartLines.length > 1 && addressAssignedCartLines.length < shippableCartLines.length ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         Button2,
         {
           kind: "secondary",
@@ -21424,3 +21471,4 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
+//# sourceMappingURL=multi-shipping-address.js.map

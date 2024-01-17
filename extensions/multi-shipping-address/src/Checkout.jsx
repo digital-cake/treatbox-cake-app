@@ -29,7 +29,7 @@ import {
     Disclosure,
     List,
     ListItem,
-    useApplyShippingAddressChange
+    useShippingAddress
 } from '@shopify/ui-extensions-react/checkout';
 
 import countryOptions from './countryOptions';
@@ -57,6 +57,8 @@ function Extension() {
     const [additionalAddresses, setAdditionalAddresses] = useState([]);
     const [openDisclosures, setOpenDisclosures] =  useState([]);
     const [selectedShippingMethods, setSelectedShippingMethods] = useState({});
+
+    const primaryAddress = useShippingAddress();
 
     const attributes = useAttributes();
 
@@ -117,8 +119,6 @@ function Extension() {
     }, [attributes]);
 
     useEffect(() => {
-
-        console.log("Lines", cartLines);
 
         for (let i = 0; i < cartLines.length; i++) {
             if (cartLines[i].merchandise.id != dataVariantId) continue;
@@ -220,7 +220,21 @@ function Extension() {
         setAddressSaving(false);
         setAdditionalAddresses(newAdditialAddresses);
 
-        const nextSelectedShippingMethods = { ...selectedShippingMethods, [additionalAddress.id]: additionalAddress.shippingMethod };
+        const nextSelectedShippingMethods = { ...selectedShippingMethods };
+
+        if (additionalAddress.items.length > 0) {
+            nextSelectedShippingMethods[additionalAddress.id] = additionalAddress.shippingMethod;
+        } else if (typeof nextSelectedShippingMethods[additionalAddress.id] != 'undefined') {
+            delete nextSelectedShippingMethods[additionalAddress.id];
+        }
+
+        const addressAssignedCartLines = additionalAddresses.map(addr => addr.items.map(item => item.lineId)).flat(1);
+        const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
+
+        if (primaryAddressLineItems.length < 1 && typeof nextSelectedShippingMethods['primary'] != 'undefined') {
+            delete nextSelectedShippingMethods['primary'];
+        }
+
         setSelectedShippingMethods(nextSelectedShippingMethods);
         applyShippingMethodLineItemProps(nextSelectedShippingMethods, newAdditialAddresses);
     };
@@ -380,7 +394,7 @@ function Extension() {
         {
             primaryAddressLineItems.length > 0 && (
                 <DeliveryMethodSelection
-                    countryCode="GB"
+                    countryCode={primaryAddress.countryCode}
                     addressId="primary"
                     onChange={(value) => onDeliveryMethodChange('primary', value)}
                     selected={selectedShippingMethods.primary ? selectedShippingMethods.primary : ""}
@@ -390,90 +404,116 @@ function Extension() {
 
         <BlockSpacer />
 
-        <View>
-            <Heading>Additional shipping addresses</Heading>
-            <Text>Ship selected items in your order to an additional locations.</Text>
-        </View>
-
         {
-            additionalAddresses.map(addr => (
-                <BlockLayout
-                    rows="auto"
-                    inlineAlignment="start"
-                    border="base"
-                    padding="base"
-                    spacing="tight"
-                    cornerRadius="base"
-                    key={addr.id}>
-
-                    <Pressable
-                          overlay={(
-                            <AddressEditModal
-                            id={`AddressEditModal_${addr.id}`}
-                            initialAddress={addr}
-                            onSave={onSaveAddress}
-                            onDelete={() => onDeleteAddress(addr.id)}
-                            saving={addressSaving}
-                            cartLines={shippableCartLines}
-                            deleting={addressDeleting}
-                            otherAddresses={additionalAddresses.filter(additional => additional.id != addr.id)}
-                            countryOptions={countryOptions.filter(opt => shippingCountries.includes(opt.value))}
-                            shop={shop.myshopifyDomain}
-                            />
-                        )}>
-
-                        <Text>{addressToString(addr)}</Text>
-
-                    </Pressable>
-
-                    {
-                        addr.items.length > 0 && (
-                            <Disclosure onToggle={setOpenDisclosures}
-                                        spacing="base">
-                                <Pressable toggles={`selected-items-${addr.id}`}
-                                            kind="plain">
-
-                                        <InlineLayout blockAlignment={'center'} spacing="extraTight">
-                                            <Text size='small'
-                                                appearance='accent'>
-                                                {openDisclosures.includes(`selected-items-${addr.id}`) ? 'Hide ' : 'Show ' }
-                                                {addr.items.length} item{addr.items.length != 1 ? 's' : ''}
-                                            </Text>
-
-                                            <Icon source={openDisclosures.includes(`selected-items-${addr.id}`) ? 'chevronUp' : 'chevronDown'}
-                                                size='extraSmall'
-                                                appearance='accent' />
-                                        </InlineLayout>
-
-                                </Pressable>
-                                <View id={`selected-items-${addr.id}`}>
-                                    <List spacing="base">
-                                        {
-                                            addr.items.map(item => {
-
-                                                const lineItem = shippableCartLines.find(line => line.id == item.lineId);
-
-                                                if (!lineItem) return null;
-
-                                                return (
-                                                    <ListItem key={lineItem.id}>
-                                                        <Text size="small">{lineItem.merchandise.title}</Text>
-                                                    </ListItem>
-                                                )
-                                            })
-                                        }
-                                    </List>
-                                </View>
-                            </Disclosure>
-                        )
-                    }
-
-                </BlockLayout>
-            ))
+            shippableCartLines.length > 1 && (
+                <View>
+                    <Heading>Additional shipping addresses</Heading>
+                    <Text>Ship selected items in your order to an additional locations.</Text>
+                </View>
+            )
         }
 
+
+
+
         {
-            addressAssignedCartLines.length < shippableCartLines.length ? (
+             shippableCartLines.length > 1 && additionalAddresses.map(addr => {
+
+                const editModal = (
+                    <AddressEditModal
+                        id={`AddressEditModal_${addr.id}`}
+                        initialAddress={addr}
+                        onSave={onSaveAddress}
+                        onDelete={() => onDeleteAddress(addr.id)}
+                        saving={addressSaving}
+                        cartLines={shippableCartLines}
+                        deleting={addressDeleting}
+                        otherAddresses={additionalAddresses.filter(additional => additional.id != addr.id)}
+                        countryOptions={countryOptions.filter(opt => shippingCountries.includes(opt.value))}
+                        shop={shop.myshopifyDomain}
+                        />
+                );
+
+                return (
+                    <InlineLayout padding="base"
+                        border="base"
+                        spacing="base"
+                        columns={['fill', 70]}
+                        blockAlignment="start">
+                        <BlockLayout
+                            rows="auto"
+                            inlineAlignment="start"
+                            spacing="tight"
+                            cornerRadius="base"
+                            key={addr.id}>
+
+                            <Pressable
+                                overlay={editModal}>
+
+                                <Text>{addressToString(addr)}</Text>
+
+                            </Pressable>
+
+                            {
+                                addr.items.length > 0 && (
+                                    <Disclosure onToggle={setOpenDisclosures}
+                                                spacing="base">
+                                        <Pressable toggles={`selected-items-${addr.id}`}
+                                                    kind="plain">
+
+                                                <InlineLayout blockAlignment={'center'} spacing="extraTight">
+                                                    <Text size='small'
+                                                        appearance='accent'>
+                                                        {openDisclosures.includes(`selected-items-${addr.id}`) ? 'Hide ' : 'Show ' }
+                                                        {addr.items.length} item{addr.items.length != 1 ? 's' : ''}
+                                                    </Text>
+
+                                                    <Icon source={openDisclosures.includes(`selected-items-${addr.id}`) ? 'chevronUp' : 'chevronDown'}
+                                                        size='extraSmall'
+                                                        appearance='accent' />
+                                                </InlineLayout>
+
+                                        </Pressable>
+                                        <View id={`selected-items-${addr.id}`}>
+                                            <List spacing="base">
+                                                {
+                                                    addr.items.map(item => {
+
+                                                        const lineItem = shippableCartLines.find(line => line.id == item.lineId);
+
+                                                        if (!lineItem) return null;
+
+                                                        return (
+                                                            <ListItem key={lineItem.id}>
+                                                                <Text size="small">{lineItem.merchandise.title}</Text>
+                                                            </ListItem>
+                                                        )
+                                                    })
+                                                }
+                                            </List>
+                                        </View>
+                                    </Disclosure>
+                                )
+                            }
+
+                        </BlockLayout>
+
+                        <Button overlay={editModal}
+                                kind="secondary"
+                                padding="tight">
+                            <Text>Edit</Text>
+                        </Button>
+
+                    </InlineLayout>
+                )
+             })
+
+
+        }
+
+
+        {
+             shippableCartLines.length > 1 && addressAssignedCartLines.length < shippableCartLines.length ? (
                 <Button kind="secondary"
                 onPress={onAddAdditionalAddressClick}
                 overlay={additionalAddressCreateModal}>
