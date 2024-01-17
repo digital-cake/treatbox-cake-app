@@ -36,6 +36,9 @@ export default function DeliveryMethodSelection({ countryCode, shop, onChange, s
 
     }, [countryCode, shop]);
 
+    const onRateChange = (rateId) => {
+        onChange(rateId, rates.find(rate => rate.id == rateId).name);
+    };
 
     return (
         <BlockStack spacing="base">
@@ -60,14 +63,14 @@ export default function DeliveryMethodSelection({ countryCode, shop, onChange, s
                 !loading && rates.length > 0 && (
                     <ChoiceList name="shipping_method"
                     value={selected}
-                    onChange={onChange}>
+                    onChange={onRateChange}>
                         <BlockStack spacing="none"
-                        cornerRadius="base"
-                        border="base">
+                            cornerRadius="base"
+                            border="base">
                             {
                                 rates.map((rate, index) => (
                                     <Pressable key={`rate-${rate.id}`}
-                                                onPress={() => onChange(rate.id.toString())}>
+                                                onPress={() => onRateChange(rate.id.toString())}>
                                         <InlineLayout spacing="base"
                                                     blockAlignment="center"
                                                     columns={['auto', 'fill', 'auto']}

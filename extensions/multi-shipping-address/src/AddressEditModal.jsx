@@ -131,8 +131,8 @@ export default function AddressEditModal(props) {
         return false;
     }
 
-    function onDeliveryMethodChange(value) {
-        const nextAddress = { ...address, shippingMethod: value };
+    function onDeliveryMethodChange(value, rateName) {
+        const nextAddress = { ...address, shippingMethod: value, shippingMethodName: rateName };
         setAddress(nextAddress);
     }
 

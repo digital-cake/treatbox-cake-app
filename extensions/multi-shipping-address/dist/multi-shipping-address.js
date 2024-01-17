@@ -20736,6 +20736,9 @@ ${errorInfo.componentStack}`);
         setLoading(false);
       });
     }, [countryCode, shop]);
+    const onRateChange = (rateId) => {
+      onChange(rateId, rates.find((rate) => rate.id == rateId).name);
+    };
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(BlockStack2, { spacing: "base", children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BlockSpacer2, {}),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Heading2, { level: "2", children: "Shipping method" }),
@@ -20746,7 +20749,7 @@ ${errorInfo.componentStack}`);
         {
           name: "shipping_method",
           value: selected,
-          onChange,
+          onChange: onRateChange,
           children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
             BlockStack2,
             {
@@ -20756,7 +20759,7 @@ ${errorInfo.componentStack}`);
               children: rates.map((rate, index) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
                 Pressable2,
                 {
-                  onPress: () => onChange(rate.id.toString()),
+                  onPress: () => onRateChange(rate.id.toString()),
                   children: [
                     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
                       InlineLayout2,
@@ -20873,8 +20876,8 @@ ${errorInfo.componentStack}`);
       }
       return false;
     }
-    function onDeliveryMethodChange(value) {
-      const nextAddress = __spreadProps(__spreadValues({}, address), { shippingMethod: value });
+    function onDeliveryMethodChange(value, rateName) {
+      const nextAddress = __spreadProps(__spreadValues({}, address), { shippingMethod: value, shippingMethodName: rateName });
       setAddress(nextAddress);
     }
     if (!address)
@@ -21378,6 +21381,7 @@ ${errorInfo.componentStack}`);
             spacing: "base",
             columns: ["fill", 70],
             blockAlignment: "start",
+            cornerRadius: "base",
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
                 BlockLayout2,
@@ -21385,7 +21389,6 @@ ${errorInfo.componentStack}`);
                   rows: "auto",
                   inlineAlignment: "start",
                   spacing: "tight",
-                  cornerRadius: "base",
                   children: [
                     /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                       Pressable2,
@@ -21415,7 +21418,8 @@ ${errorInfo.componentStack}`);
                                       openDisclosures.includes(`selected-items-${addr.id}`) ? "Hide " : "Show ",
                                       addr.items.length,
                                       " item",
-                                      addr.items.length != 1 ? "s" : ""
+                                      addr.items.length != 1 ? "s" : "",
+                                      addr.shippingMethodName ? ` + Shipping` : ""
                                     ]
                                   }
                                 ),
@@ -21430,12 +21434,15 @@ ${errorInfo.componentStack}`);
                               ] })
                             }
                           ),
-                          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(List2, { spacing: "base", children: addr.items.map((item) => {
-                            const lineItem = shippableCartLines.find((line) => line.id == item.lineId);
-                            if (!lineItem)
-                              return null;
-                            return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
-                          }) }) })
+                          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(View2, { id: `selected-items-${addr.id}`, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(List2, { spacing: "base", children: [
+                            addr.items.map((item) => {
+                              const lineItem = shippableCartLines.find((line) => line.id == item.lineId);
+                              if (!lineItem)
+                                return null;
+                              return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: lineItem.merchandise.title }) }, lineItem.id);
+                            }),
+                            addr.shippingMethodName && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ListItem2, { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text2, { size: "small", children: addr.shippingMethodName }) }, `${addr.id}_shipping-method`)
+                          ] }) })
                         ]
                       }
                     )
@@ -21471,4 +21478,3 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
-//# sourceMappingURL=multi-shipping-address.js.map

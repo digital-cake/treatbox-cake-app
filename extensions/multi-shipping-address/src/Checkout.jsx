@@ -439,12 +439,12 @@ function Extension() {
                         border="base"
                         spacing="base"
                         columns={['fill', 70]}
-                        blockAlignment="start">
+                        blockAlignment="start"
+                        cornerRadius="base">
                         <BlockLayout
                             rows="auto"
                             inlineAlignment="start"
                             spacing="tight"
-                            cornerRadius="base"
                             key={addr.id}>
 
                             <Pressable
@@ -466,6 +466,7 @@ function Extension() {
                                                         appearance='accent'>
                                                         {openDisclosures.includes(`selected-items-${addr.id}`) ? 'Hide ' : 'Show ' }
                                                         {addr.items.length} item{addr.items.length != 1 ? 's' : ''}
+                                                        {addr.shippingMethodName ? ` + Shipping` : ''}
                                                     </Text>
 
                                                     <Icon source={openDisclosures.includes(`selected-items-${addr.id}`) ? 'chevronUp' : 'chevronDown'}
@@ -489,6 +490,13 @@ function Extension() {
                                                             </ListItem>
                                                         )
                                                     })
+                                                }
+                                                {
+                                                    addr.shippingMethodName && (
+                                                        <ListItem key={`${addr.id}_shipping-method`}>
+                                                            <Text size="small">{addr.shippingMethodName}</Text>
+                                                        </ListItem>
+                                                    )
                                                 }
                                             </List>
                                         </View>
