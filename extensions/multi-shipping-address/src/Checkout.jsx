@@ -114,8 +114,6 @@ function Extension() {
             }
         }
 
-        console.log("ATTRIBUTES", attributes);
-
     }, [attributes]);
 
     useEffect(() => {
@@ -140,15 +138,21 @@ function Extension() {
 
     useBuyerJourneyIntercept(({ canBlockProgress }) => {
         if (canBlockProgress) {
-            // return {
-            //     behavior: 'block',
-            //     reason: "Invalid additional shipping address #1",
-            //     errors: [
-            //         {
-            //             message: 'Shipping address in your additional shipping address is invalid',
-            //         }
-            //     ]
-            // }
+
+            const addressAssignedCartLines = additionalAddresses.map(addr => addr.items.map(item => item.lineId)).flat(1);
+            const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
+
+            if (primaryAddressLineItems && !selectedShippingMethods.primary) {
+                return {
+                    behavior: 'block',
+                    reason: "No shipping method selected",
+                    errors: [
+                        {
+                            message: 'You must select a shipping method for your primary shipping address',
+                        }
+                    ]
+                }
+            }
         }
 
         return {
@@ -323,7 +327,7 @@ function Extension() {
 
     const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
 
-    if (shippableCartLines.length < 2) return null;
+    // if (shippableCartLines.length < 2) return null;
 
     const additionalAddressCreateModal = (
        <AddressEditModal
@@ -440,12 +444,12 @@ function Extension() {
                         spacing="base"
                         columns={['fill', 70]}
                         blockAlignment="start"
-                        cornerRadius="base">
+                        cornerRadius="base"
+                        key={addr.id}>
                         <BlockLayout
                             rows="auto"
                             inlineAlignment="start"
-                            spacing="tight"
-                            key={addr.id}>
+                            spacing="tight">
 
                             <Pressable
                                 overlay={editModal}>
@@ -521,7 +525,7 @@ function Extension() {
 
 
         {
-             shippableCartLines.length > 1 && addressAssignedCartLines.length < shippableCartLines.length ? (
+             shippableCartLines.length > 1 && addressAssignedCartLines.length < shippableCartLines.length && (
                 <Button kind="secondary"
                 onPress={onAddAdditionalAddressClick}
                 overlay={additionalAddressCreateModal}>
@@ -530,7 +534,11 @@ function Extension() {
                         <Text>Add shipping address</Text>
                     </InlineStack>
                 </Button>
-            ) : (
+            )
+        }
+
+        {
+            shippableCartLines.length > 1 && addressAssignedCartLines.length >= shippableCartLines.length && (
                 <Banner>
                     <Text>All order items have been assigned to an additional address</Text>
                 </Banner>
