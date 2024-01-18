@@ -23,7 +23,7 @@ export default function DeliveryMethodSelection({ countryCode, shop, onChange, s
 
         setLoading(true);
 
-        fetch(`https://3816-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`)
+        fetch(`https://9b62-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`)
         .then(response => response.json())
         .then(response => {
             setRates(response.rates);
@@ -34,7 +34,7 @@ export default function DeliveryMethodSelection({ countryCode, shop, onChange, s
             setLoading(false);
         });
 
-    }, [countryCode, shop]);
+    }, [countryCode, shop, appMetafields]);
 
     const onRateChange = (rateId) => {
         onChange(rateId, rates.find(rate => rate.id == rateId).name);

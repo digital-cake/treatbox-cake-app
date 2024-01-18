@@ -29,7 +29,8 @@ import {
     Disclosure,
     List,
     ListItem,
-    useShippingAddress
+    useShippingAddress,
+    useSettings
 } from '@shopify/ui-extensions-react/checkout';
 
 import countryOptions from './countryOptions';
@@ -41,11 +42,12 @@ export default reactExtension(
   () => <Extension />,
 );
 
-const dataVariantId = 'gid://shopify/ProductVariant/47534018953535';
-
 function Extension() {
 
     const {ui, query, shop} = useApi();
+
+    const settings = useSettings();
+    const dataVariantId = settings.shipping_data_variant || 'gid://shopify/ProductVariant/47534018953535';
 
     const cartLines = useCartLines();
     const shippableCartLines  = cartLines.filter(line => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);

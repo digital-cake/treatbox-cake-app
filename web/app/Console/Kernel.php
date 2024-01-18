@@ -5,6 +5,8 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\ClickAndDropGetTrackingNumbers;
+use App\Console\Commands\FulfillClickAndDropOrders;
+use App\Console\Commands\SetAppHostMetafield;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,6 +17,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         ClickAndDropGetTrackingNumbers::class,
+        FulfillClickAndDropOrders::class,
+        SetAppHostMetafield::class
     ];
 
     /**
@@ -26,6 +30,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command(ClickAndDropGetTrackingNumbers::class)->everyFiveMinutes();
+        $schedule->command(FulfillClickAndDropOrders::class)->everyFiveMinutes();
     }
 
     /**

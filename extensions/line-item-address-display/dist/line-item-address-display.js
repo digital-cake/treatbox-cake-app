@@ -19631,4 +19631,3 @@ ${errorInfo.componentStack}`);
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(View2, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text2, { appearance: "subdued", children: assignedAddress }) });
   }
 })();
-//# sourceMappingURL=line-item-address-display.js.map

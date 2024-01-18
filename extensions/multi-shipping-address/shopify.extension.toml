@@ -33,9 +33,9 @@ network_access = true
 # products, customers, and more. Learn more:
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#metafields
 
-# [[extensions.metafields]]
-# namespace = "my_namespace"
-# key = "my_key"
+[[extensions.metafields]]
+namespace = "cake"
+key = "host"
 # [[extensions.metafields]]
 # namespace = "my_namespace"
 # key = "my_other_key"
@@ -44,9 +44,9 @@ network_access = true
 # your extension. Learn more:
 # https://shopify.dev/docs/api/checkout-ui-extensions/unstable/configuration#settings-definition
 
-# [extensions.settings]
-# [[extensions.settings.fields]]
-# key = "banner_title"
-# type = "single_line_text_field"
-# name = "Banner title"
-# description = "Enter a title for the banner"
+[extensions.settings]
+[[extensions.settings.fields]]
+key = "shipping_data_variant"
+type = "variant_reference"
+name = "Shipping Data Variant"
+description = "In order for shipping method data to be sent to the custom Carrier Service API, a free variant will need to be selected here"

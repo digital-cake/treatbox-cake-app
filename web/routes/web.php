@@ -24,6 +24,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShippingRateController;
 use App\Http\Controllers\ShopifyCarrierServiceCallbackController;
 use App\Http\Controllers\ShopifyCartTransformController;
+use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\SetAppHostMetafield;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,7 +94,12 @@ Route::get('/api/auth/callback', function (Request $request) {
         );
     }
 
+    Artisan::queue(SetAppHostMetafield::class, [
+        'shop' => $shop
+    ]);
+
     $redirectUrl = Utils::getEmbeddedAppUrl($host);
+
     if (Config::get('shopify.billing.required')) {
         list($hasPayment, $confirmationUrl) = EnsureBilling::check($session, Config::get('shopify.billing'));
 

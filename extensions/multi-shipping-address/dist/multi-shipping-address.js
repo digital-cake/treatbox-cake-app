@@ -19713,6 +19713,12 @@ ${errorInfo.componentStack}`);
     throw new ExtensionHasNoMethodError("applyCartLinesChange", api.extension.target);
   }
 
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/settings.mjs
+  function useSettings() {
+    const settings = useSubscription(useApi().settings);
+    return settings;
+  }
+
   // extensions/multi-shipping-address/src/countryOptions.js
   var countryOptions_default = countryOptions = [
     {
@@ -20728,14 +20734,14 @@ ${errorInfo.componentStack}`);
     const [loading, setLoading] = (0, import_react35.useState)(false);
     (0, import_react35.useEffect)(() => {
       setLoading(true);
-      fetch(`https://3816-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
+      fetch(`https://9b62-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
         setRates(response.rates);
         setLoading(false);
       }).catch((err) => {
         console.log(err);
         setLoading(false);
       });
-    }, [countryCode, shop]);
+    }, [countryCode, shop, appMetafields]);
     const onRateChange = (rateId) => {
       onChange(rateId, rates.find((rate) => rate.id == rateId).name);
     };
@@ -21069,9 +21075,10 @@ ${errorInfo.componentStack}`);
     "purchase.checkout.delivery-address.render-after",
     () => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Extension, {})
   );
-  var dataVariantId = "gid://shopify/ProductVariant/47534018953535";
   function Extension() {
     const { ui, query, shop } = useApi();
+    const settings = useSettings();
+    const dataVariantId = settings.shipping_data_variant || "gid://shopify/ProductVariant/47534018953535";
     const cartLines = useCartLines();
     const shippableCartLines = cartLines.filter((line) => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);
     const [shippingCountries, setShippingCountries] = (0, import_react37.useState)([]);
