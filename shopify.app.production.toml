@@ -1,0 +1,25 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "Treatbox Cake App"
+client_id = "5a6ef295ab4c215643513230e668a4e1"
+application_url = "https://treatboxapp.codelayer.io"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_shipping,write_orders,write_cart_transforms,write_assigned_fulfillment_orders,write_merchant_managed_fulfillment_orders,write_third_party_fulfillment_orders,write_fulfillments,read_locations"
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = [
+  "https://treatboxapp.codelayer.io/auth/callback",
+  "https://treatboxapp.codelayer.io/auth/shopify/callback",
+  "https://treatboxapp.codelayer.io/api/auth/callback",
+  "https://treatboxapp.codelayer.io/.shopify/graphiql/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
