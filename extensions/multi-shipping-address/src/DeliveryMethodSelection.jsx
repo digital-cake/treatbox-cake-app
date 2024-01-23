@@ -9,7 +9,8 @@ import {
     Pressable,
     InlineLayout,
     View,
-    Choice
+    Choice,
+    useAppMetafields
 } from "@shopify/ui-extensions-react/checkout";
 
 import { ChoiceList } from "@shopify/ui-extensions/checkout";
@@ -18,12 +19,17 @@ export default function DeliveryMethodSelection({ countryCode, shop, onChange, s
 
     const [rates, setRates] = useState([]);
     const [loading, setLoading] = useState(false);
+    const appMetafields = useAppMetafields();
 
     useEffect(() => {
 
+        const appHostMetafield = appMetafields.find(metafield => metafield.metafield.key == 'app_host');
+
+        if (!appHostMetafield) return;
+
         setLoading(true);
 
-        fetch(`https://9b62-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`)
+         fetch(`https://${appHostMetafield.metafield.value}/public/api/shipping-rates?country=${countryCode}&shop=${shop}`)
         .then(response => response.json())
         .then(response => {
             setRates(response.rates);

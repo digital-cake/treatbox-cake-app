@@ -1161,7 +1161,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useCallback(callback, deps);
           }
-          function useMemo3(create, deps) {
+          function useMemo4(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useMemo(create, deps);
           }
@@ -1932,7 +1932,7 @@
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
           exports.useLayoutEffect = useLayoutEffect;
-          exports.useMemo = useMemo3;
+          exports.useMemo = useMemo4;
           exports.useReducer = useReducer;
           exports.useRef = useRef3;
           exports.useState = useState5;
@@ -18424,7 +18424,7 @@
   });
 
   // extensions/multi-shipping-address/src/Checkout.jsx
-  var import_react37 = __toESM(require_react());
+  var import_react38 = __toESM(require_react());
 
   // node_modules/@remote-ui/rpc/build/esm/memory.mjs
   function isBasicObject(value) {
@@ -19713,6 +19713,29 @@ ${errorInfo.componentStack}`);
     throw new ExtensionHasNoMethodError("applyCartLinesChange", api.extension.target);
   }
 
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/app-metafields.mjs
+  var import_react35 = __toESM(require_react(), 1);
+  function useAppMetafields(filters = {}) {
+    const appMetafields = useSubscription(useApi().appMetafields);
+    return (0, import_react35.useMemo)(() => {
+      if (filters.key && !filters.namespace) {
+        throw new CheckoutUIExtensionError("You must pass in a namespace with a key");
+      }
+      const filterKeys = Object.keys(filters);
+      if (filterKeys.length) {
+        return appMetafields.filter((app) => {
+          return filterKeys.every((key) => {
+            if (key === "id" || key === "type") {
+              return app.target[key] === filters[key];
+            }
+            return app.metafield[key] === filters[key];
+          });
+        });
+      }
+      return appMetafields;
+    }, [filters, appMetafields]);
+  }
+
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/settings.mjs
   function useSettings() {
     const settings = useSubscription(useApi().settings);
@@ -20724,17 +20747,21 @@ ${errorInfo.componentStack}`);
   ];
 
   // extensions/multi-shipping-address/src/AddressEditModal.jsx
-  var import_react36 = __toESM(require_react());
+  var import_react37 = __toESM(require_react());
 
   // extensions/multi-shipping-address/src/DeliveryMethodSelection.jsx
-  var import_react35 = __toESM(require_react());
+  var import_react36 = __toESM(require_react());
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
   function DeliveryMethodSelection({ countryCode, shop, onChange, selected }) {
-    const [rates, setRates] = (0, import_react35.useState)([]);
-    const [loading, setLoading] = (0, import_react35.useState)(false);
-    (0, import_react35.useEffect)(() => {
+    const [rates, setRates] = (0, import_react36.useState)([]);
+    const [loading, setLoading] = (0, import_react36.useState)(false);
+    const appMetafields = useAppMetafields();
+    (0, import_react36.useEffect)(() => {
+      const appHostMetafield = appMetafields.find((metafield) => metafield.metafield.key == "app_host");
+      if (!appHostMetafield)
+        return;
       setLoading(true);
-      fetch(`https://9b62-88-98-16-1.ngrok-free.app/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
+      fetch(`https://${appHostMetafield.metafield.value}/public/api/shipping-rates?country=${countryCode}&shop=${shop}`).then((response) => response.json()).then((response) => {
         setRates(response.rates);
         setLoading(false);
       }).catch((err) => {
@@ -20814,12 +20841,12 @@ ${errorInfo.componentStack}`);
       otherAddresses,
       shop
     } = props;
-    const [address, setAddress] = (0, import_react36.useState)(null);
-    const [fieldErrors, setFieldErrors] = (0, import_react36.useState)({});
-    (0, import_react36.useEffect)(() => {
+    const [address, setAddress] = (0, import_react37.useState)(null);
+    const [fieldErrors, setFieldErrors] = (0, import_react37.useState)({});
+    (0, import_react37.useEffect)(() => {
       setAddress(initialAddress);
     }, [initialAddress]);
-    (0, import_react36.useEffect)(() => {
+    (0, import_react37.useEffect)(() => {
       setFieldErrors({});
     }, [address == null ? void 0 : address.firstName, address == null ? void 0 : address.lastName, address == null ? void 0 : address.address1, address == null ? void 0 : address.city, address == null ? void 0 : address.zip, address == null ? void 0 : address.country]);
     function onCountryCodeChange(value) {
@@ -21081,18 +21108,18 @@ ${errorInfo.componentStack}`);
     const dataVariantId = settings.shipping_data_variant || "gid://shopify/ProductVariant/47534018953535";
     const cartLines = useCartLines();
     const shippableCartLines = cartLines.filter((line) => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);
-    const [shippingCountries, setShippingCountries] = (0, import_react37.useState)([]);
-    const [additionalAddressEdit, setAdditionalAddressEdit] = (0, import_react37.useState)({});
-    const [addressSaving, setAddressSaving] = (0, import_react37.useState)(false);
-    const [addressDeleting, setAddressDeleting] = (0, import_react37.useState)(false);
-    const [additionalAddresses, setAdditionalAddresses] = (0, import_react37.useState)([]);
-    const [openDisclosures, setOpenDisclosures] = (0, import_react37.useState)([]);
-    const [selectedShippingMethods, setSelectedShippingMethods] = (0, import_react37.useState)({});
+    const [shippingCountries, setShippingCountries] = (0, import_react38.useState)([]);
+    const [additionalAddressEdit, setAdditionalAddressEdit] = (0, import_react38.useState)({});
+    const [addressSaving, setAddressSaving] = (0, import_react38.useState)(false);
+    const [addressDeleting, setAddressDeleting] = (0, import_react38.useState)(false);
+    const [additionalAddresses, setAdditionalAddresses] = (0, import_react38.useState)([]);
+    const [openDisclosures, setOpenDisclosures] = (0, import_react38.useState)([]);
+    const [selectedShippingMethods, setSelectedShippingMethods] = (0, import_react38.useState)({});
     const primaryAddress = useShippingAddress();
     const attributes = useAttributes();
     const applyAttributeChange = useApplyAttributeChange();
     const applyCartLinesChange = useApplyCartLinesChange();
-    (0, import_react37.useEffect)(() => {
+    (0, import_react38.useEffect)(() => {
       query(
         `query {
               shop {
@@ -21103,7 +21130,7 @@ ${errorInfo.componentStack}`);
         setShippingCountries(data.shop.shipsToCountries);
       }).catch(console.error);
     }, []);
-    (0, import_react37.useEffect)(() => {
+    (0, import_react38.useEffect)(() => {
       for (let i = 0; i < attributes.length; i++) {
         if (attributes[i].key != "__additional_addresses")
           continue;
@@ -21128,7 +21155,7 @@ ${errorInfo.componentStack}`);
         }
       }
     }, [attributes]);
-    (0, import_react37.useEffect)(() => {
+    (0, import_react38.useEffect)(() => {
       for (let i = 0; i < cartLines.length; i++) {
         if (cartLines[i].merchandise.id != dataVariantId)
           continue;
@@ -21496,4 +21523,3 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
-//# sourceMappingURL=multi-shipping-address.js.map

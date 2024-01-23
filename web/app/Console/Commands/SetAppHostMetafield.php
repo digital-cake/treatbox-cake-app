@@ -51,21 +51,21 @@ class SetAppHostMetafield extends Command
 
         $client = new Graphql($session->shop, $session->access_token);
 
-        $app_installation_query = <<<'QUERY'
+        $shop_query = <<<'QUERY'
         {
-            currentAppInstallation {
+            shop {
                 id
             }
         }
         QUERY;
 
         $response = $client->query([
-            'query' => $app_installation_query
+            'query' => $shop_query
         ]);
 
         $response = $response->getDecodedBody();
 
-        $app_installation_id = $response['data']['currentAppInstallation']['id'];
+        $shop_id = $response['data']['shop']['id'];
 
         $metafield_set_mutation =  <<<'QUERY'
         mutation CreateAppDataMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
@@ -89,10 +89,10 @@ class SetAppHostMetafield extends Command
             'variables' => [
                 'metafieldsSetInput' => [
                     "namespace" => "cake",
-                    "key" => "host",
+                    "key" => "app_host",
                     "type" => "single_line_text_field",
                     "value" => Context::$HOST_NAME,
-                    "ownerId" => $app_installation_id
+                    "ownerId" => $shop_id
                 ]
             ]
         ]);

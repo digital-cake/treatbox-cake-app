@@ -35,7 +35,7 @@ network_access = true
 
 [[extensions.metafields]]
 namespace = "cake"
-key = "host"
+key = "app_host"
 # [[extensions.metafields]]
 # namespace = "my_namespace"
 # key = "my_other_key"
