@@ -92,7 +92,11 @@ export default function Orders() {
 
     return (
         <Page
-            title="Orders">
+            title="Orders"
+            backAction={{
+                content: "Home",
+                url: "/"
+            }}>
             <Layout>
                 <Layout.Section>
                     <Card padding={0}>

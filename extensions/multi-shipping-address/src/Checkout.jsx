@@ -204,24 +204,18 @@ function Extension() {
         }
 
         if (isNewAddress) {
+            ui.overlay.close('AddressCreateModal');
             newAdditialAddresses.push(additionalAddress);
         } else {
+            ui.overlay.close(`AddressEditModal_${additionalAddress.id}`);
             newAdditialAddresses[currentAddressIndex] = additionalAddress;
         }
-
-        console.log(JSON.stringify(newAdditialAddresses, null, "\t"));
 
         await applyAttributeChange({
             type: 'updateAttribute',
             key: '__additional_addresses',
             value: JSON.stringify(newAdditialAddresses)
         });
-
-        if (isNewAddress) {
-            ui.overlay.close('AddressCreateModal');
-        } else {
-            ui.overlay.close(`AddressEditModal_${additionalAddress.id}`);
-        }
 
         setAddressSaving(false);
         setAdditionalAddresses(newAdditialAddresses);
