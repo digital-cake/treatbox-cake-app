@@ -66,6 +66,14 @@ class ReconcileMissingOrders extends Command
             foreach($response_data['orders'] as $order) {
                 $count = Order::where('shopify_id', $order['id'])->count();
 
+                if (!is_array($order['shipping_lines']) && count($order['shipping_lines']) < 1) {
+                    continue;
+                }
+
+                if ($order['source_name'] == 'subscription_contract') {
+                    continue;
+                }
+
                 if ($count > 0) {
                     $this->info("Order {$order['id']} exists. Skipping...");
                     continue;
