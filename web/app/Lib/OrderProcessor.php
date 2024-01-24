@@ -5,6 +5,7 @@ namespace App\Lib;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Jobs\ClickAndDropOrderImport;
+use App\Models\SettingOption;
 use App\Models\ShippingRate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -16,9 +17,19 @@ class OrderProcessor
 
     public static function process(string $shop, array $order) : void
     {
+
+        $prefix = SettingOption::where('shop', $shop)
+                    ->where('name', 'click_and_drop_channel_ref_prefix')
+                    ->value('value');
+
+        if (!is_string($prefix)) {
+            $prefix = "";
+        } else {
+            $prefix = trim($prefix);
+        }
+
         $line_items = self::extractLineItems($order);
         $shipping_addresses = self::extractShippingAddresses($order, $line_items);
-
 
         $shipping_rates = ShippingRate::all();
 
@@ -33,7 +44,7 @@ class OrderProcessor
 
         foreach($shipping_addresses as $index => $shipping_address) {
 
-            $channel_ref = "TEST_{$order['name']}_{$index}";
+            $channel_ref = "{$prefix}{$order['name']}_{$index}";
 
             $count = Order::where('channel_reference', $channel_ref)->count();
 

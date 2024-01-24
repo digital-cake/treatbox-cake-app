@@ -147,13 +147,12 @@ export default function SettingsPage() {
                     <Layout.Section oneThird>
                         <Box paddingBlockStart={4}>
                             <VerticalStack gap="4">
-                                <Text id="CarrierServices" variant="headingMd">Royal Mail Click & Drop API</Text>
+                                <Text id="CarrierServices" variant="headingMd">Royal Mail Click & Drop</Text>
                                 <Text color="subdued" as="p">
-                                    Enter your Click & Drop API key this ensures orders that are placed on this store are imported into Royal Mails Click & Drop service
+                                    Configure Royal Mail Click & Drop integration settings.
                                 </Text>
                             </VerticalStack>
                         </Box>
-
                     </Layout.Section>
 
                     <Layout.Section>
@@ -165,9 +164,16 @@ export default function SettingsPage() {
                                     </div>
                                 ) : (
                                     <VerticalStack gap="4">
-                                            <TextField label="API Key"
+
+                                        <TextField label="API Key"
                                                 onChange={(value) => onChangeSettingOption('click_and_drop_api_key', value)}
-                                                value={settingOptions.click_and_drop_api_key } />
+                                                value={settingOptions.click_and_drop_api_key }
+                                                helpText="Allows this app to comunicate with Click & Drop" />
+
+                                        <TextField label="Channel reference prefix"
+                                                onChange={(value) => onChangeSettingOption('click_and_drop_channel_ref_prefix', value)}
+                                                value={settingOptions.click_and_drop_channel_ref_prefix }
+                                                helpText="Appears before shopify order number in the channel reference field" />
 
                                         <HorizontalStack align="end">
                                             <Button primary
