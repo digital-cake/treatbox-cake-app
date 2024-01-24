@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\ClickAndDropGetTrackingNumbers;
 use App\Console\Commands\FulfillClickAndDropOrders;
+use App\Console\Commands\ReconcileMissingOrders;
 use App\Console\Commands\RetryClickAndDropImport;
 use App\Console\Commands\SetAppHostMetafield;
 
@@ -20,7 +21,8 @@ class Kernel extends ConsoleKernel
         ClickAndDropGetTrackingNumbers::class,
         FulfillClickAndDropOrders::class,
         SetAppHostMetafield::class,
-        RetryClickAndDropImport::class
+        RetryClickAndDropImport::class,
+        ReconcileMissingOrders::class
     ];
 
     /**
@@ -34,6 +36,7 @@ class Kernel extends ConsoleKernel
         $schedule->command(ClickAndDropGetTrackingNumbers::class)->everyFiveMinutes();
         $schedule->command(FulfillClickAndDropOrders::class)->everyFiveMinutes();
         $schedule->command(RetryClickAndDropImport::class)->everyFiveMinutes();
+        $schedule->command(ReconcileMissingOrders::class)->hourly();
     }
 
     /**
