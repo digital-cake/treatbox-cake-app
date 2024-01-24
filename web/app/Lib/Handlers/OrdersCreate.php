@@ -19,6 +19,10 @@ class OrdersCreate implements Handler
             return;
         }
 
+        if ($order['source_name'] == 'subscription_contract') {
+            return;
+        }
+
         try {
             OrderProcessor::process($shop, $order);
         } catch(Exception $e) {
