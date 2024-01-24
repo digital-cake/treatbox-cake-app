@@ -23,14 +23,6 @@ class OrdersCreate implements Handler
             return;
         }
 
-        $shipping_type_attribute = Arr::first($order['note_attributes'], function($attr, $key) {
-            return $attr['name'] == 'Shipping Type';
-        }, null);
-
-        if ($shipping_type_attribute) {
-            return;
-        }
-
         try {
             OrderProcessor::process($shop, $order);
         } catch(Exception $e) {
