@@ -82,6 +82,7 @@ class ReconcileMissingOrders extends Command
                 $this->info("Order {$order['id']} doesn't exist. Processing...");
 
                 OrderProcessor::process($session->shop, $order);
+
             }
 
         }

@@ -18,6 +18,8 @@ class OrderProcessor
     public static function process(string $shop, array $order) : void
     {
 
+        if (empty($order['shipping_address'])) return;
+
         $prefix = SettingOption::where('shop', $shop)
                     ->where('name', 'click_and_drop_channel_ref_prefix')
                     ->value('value');
