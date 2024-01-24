@@ -94,19 +94,11 @@ class ClickAndDropOrderImport implements ShouldQueue
 
         $order_items = $this->order->items()->get();
 
-        $item_skus = [];
-
-        foreach($order_items as $order_item) {
+        foreach($order_items as $index => $order_item) {
 
             $item['packages'][0]['weightInGrams'] += ($order_item->weight * $order_item->quantity);
 
-            $sku = !empty($order_item->sku) ? Str::limit($order_item->sku, 90, "") : Str::limit($order_item->item_name, 90, "");
-
-            if (in_array($sku, $item_skus)) {
-                $sku .=  "-" .  Str::random(5);
-            }
-
-            $item_skus[] = $sku;
+            $sku = Str::random(3) . $index;
 
             $item['packages'][0]['contents'][] = [
                 'name' => Str::limit($order_item->item_name, 800, ""),
