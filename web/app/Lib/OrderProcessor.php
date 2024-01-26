@@ -31,7 +31,7 @@ class OrderProcessor
         }
 
         $line_items = self::extractLineItems($order);
-        $shipping_addresses = self::extractShippingAddresses($order, $line_items);
+        $shipping_addresses = self::extractShippingAddresses($order, $line_items->where('shipping_item', false));
 
         $shipping_rates = ShippingRate::all();
 
@@ -254,8 +254,6 @@ class OrderProcessor
             if (is_array($address['items'])) {
                 foreach($address['items'] as $item) {
                     $custom_identifier = null;
-
-
 
                     if ($item['boxId']) {
                         $custom_identifier = $item['boxId'];
