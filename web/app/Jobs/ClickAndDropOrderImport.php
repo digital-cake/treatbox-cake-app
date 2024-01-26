@@ -57,7 +57,7 @@ class ClickAndDropOrderImport implements ShouldQueue
                     'addressLine2' => $this->order->recipient_address2 ? Str::limit($this->order->recipient_address2, 97) : "",
                     'city' => $this->order->recipient_city,
                     'county' => $this->order->recipient_county,
-                    'postcode' => $this->order->recipient_postcode,
+                    'postcode' => !empty($this->order->recipient_postcode) ? $this->order->recipient_postcode : 'N/a',
                     'countryCode' => $this->order->recipient_country_code
                 ]
             ],
@@ -67,7 +67,7 @@ class ClickAndDropOrderImport implements ShouldQueue
                     'addressLine1' =>  Str::limit($this->order->billing_address1, 97),
                     'addressLine2' => $this->order->billing_address2 ? Str::limit($this->order->billing_address2, 97) : "",
                     'city' => $this->order->billing_city,
-                    'postcode' => $this->order->billing_postcode,
+                    'postcode' => !empty($this->order->billing_postcode) ? $this->order->billing_postcode : 'N/a',
                     'countryCode' => $this->order->billing_country_code
                 ]
             ],

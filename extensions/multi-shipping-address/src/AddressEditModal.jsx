@@ -61,7 +61,15 @@ export default function AddressEditModal(props) {
 
         setFieldErrors({});
 
-        const requiredFields = ['lastName', 'address1', 'city', 'zip', 'country'];
+        const requiredFields = ['lastName', 'address1', 'city', 'country'];
+
+        if (address.countryCode != 'AE') {
+            address.zip = null;
+            requiredFields.push('zip');
+        } else {
+            requiredFields.push('province');
+        }
+
         const newFieldErrors = {};
 
         for (let field of requiredFields) {
@@ -136,6 +144,42 @@ export default function AddressEditModal(props) {
         setAddress(nextAddress);
     }
 
+    function renderProvince(country) {
+
+        switch(country) {
+            case 'US':
+                return (
+                    <Select label="State"
+                        options={[{"label":"Alabama","value":"Alabama"},{"label":"Alaska","value":"Alaska"},{"label":"American Samoa","value":"American Samoa"},{"label":"Arizona","value":"Arizona"},{"label":"Arkansas","value":"Arkansas"},{"label":"California","value":"California"},{"label":"Colorado","value":"Colorado"},{"label":"Connecticut","value":"Connecticut"},{"label":"Delaware","value":"Delaware"},{"label":"District of Columbia","value":"District of Columbia"},{"label":"Federated States of Micronesia","value":"Federated States of Micronesia"},{"label":"Florida","value":"Florida"},{"label":"Georgia","value":"Georgia"},{"label":"Guam","value":"Guam"},{"label":"Hawaii","value":"Hawaii"},{"label":"Idaho","value":"Idaho"},{"label":"Illinois","value":"Illinois"},{"label":"Indiana","value":"Indiana"},{"label":"Iowa","value":"Iowa"},{"label":"Kansas","value":"Kansas"},{"label":"Kentucky","value":"Kentucky"},{"label":"Louisiana","value":"Louisiana"},{"label":"Maine","value":"Maine"},{"label":"Marshall Islands","value":"Marshall Islands"},{"label":"Maryland","value":"Maryland"},{"label":"Massachusetts","value":"Massachusetts"},{"label":"Michigan","value":"Michigan"},{"label":"Minnesota","value":"Minnesota"},{"label":"Mississippi","value":"Mississippi"},{"label":"Missouri","value":"Missouri"},{"label":"Montana","value":"Montana"},{"label":"Nebraska","value":"Nebraska"},{"label":"Nevada","value":"Nevada"},{"label":"New Hampshire","value":"New Hampshire"},{"label":"New Jersey","value":"New Jersey"},{"label":"New Mexico","value":"New Mexico"},{"label":"New York","value":"New York"},{"label":"North Carolina","value":"North Carolina"},{"label":"North Dakota","value":"North Dakota"},{"label":"Northern Mariana Islands","value":"Northern Mariana Islands"},{"label":"Ohio","value":"Ohio"},{"label":"Oklahoma","value":"Oklahoma"},{"label":"Oregon","value":"Oregon"},{"label":"Palau","value":"Palau"},{"label":"Pennsylvania","value":"Pennsylvania"},{"label":"Puerto Rico","value":"Puerto Rico"},{"label":"Rhode Island","value":"Rhode Island"},{"label":"South Carolina","value":"South Carolina"},{"label":"South Dakota","value":"South Dakota"},{"label":"Tennessee","value":"Tennessee"},{"label":"Texas","value":"Texas"},{"label":"Utah","value":"Utah"},{"label":"Vermont","value":"Vermont"},{"label":"Virgin Island","value":"Virgin Island"},{"label":"Virginia","value":"Virginia"},{"label":"Washington","value":"Washington"},{"label":"West Virginia","value":"West Virginia"},{"label":"Wisconsin","value":"Wisconsin"},{"label":"Wyoming","value":"Wyoming"}]}
+                        value={address.province}
+                        onChange={value => setAddress(addr => ({ ...addr, province: value }))} />
+                )
+            case 'AU':
+                return (
+                    <Select label="State/territory"
+                    options={[{"label":"New South Wales","value": "New South Wales"},{"label": "Northern Territory", "value": "Northern Territory"},{"label": "Queensland", "value": "Queensland"},{"label":"South Australia", "value": "South Australia"},{ "label": "Tasmania", "value": "Tasmania"},{ "label":"Victoria","value":"Victoria"},{ "label": "Western Australia", "value": "Western Australia"}]}
+                    value={address.province}
+                    onChange={value => setAddress(addr => ({ ...addr, province: value }))} />
+                )
+            case 'CA':
+                return (
+                    <Select label="Province"
+                    options={[{"label":"Newfoundland and Labrador","value":"Newfoundland and Labrador"},{"label":"Prince Edward Island","value":"Prince Edward Island"},{"label":"Nova Scotia","value":"Nova Scotia"},{"label":"New Brunswick","value":"New Brunswick"},{"label":"Quebec","value":"Quebec"},{"label":"Ontario","value":"Ontario"},{"label":"Manitoba","value":"Manitoba"},{"label":"Saskatchewan","value":"Saskatchewan"},{"label":"Alberta","value":"Alberta"},{"label":"British Columbia","value":"British Columbia"}]}
+                    value={address.province}
+                    onChange={value => setAddress(addr => ({ ...addr, province: value }))} />
+                )
+            case 'AE':
+                return (
+                    <Select label="Emirate"
+                        options={[{"label":"Abu Dhabi","value":"Abu Dhabi"},{"label":"Ajman","value":"Ajman"},{"label":"Dubai","value":"Dubai"},{"label":"Fujairah","value":"Fujairah"},{"label":"Ras al-Khaimah","value":"Ras al-Khaimah"},{"label":"Sharjah","value":"Sharjah"},{"label":"Umm al-Quwain","value":"Umm al-Quwain"}]}
+                        value={address.province}
+                        onChange={value => setAddress(addr => ({ ...addr, province: value }))} />
+                )
+            default:
+                return null;
+        }
+    }
+
     if (!address) return null;
 
     return (
@@ -181,11 +225,21 @@ export default function AddressEditModal(props) {
                                     onInput={value => setAddress(addr => ({ ...addr, city: value }))}
                                     error={fieldErrors.city}
                                     />
-                        <TextField label="Postcode"
+
+                        {
+                            renderProvince(address.countryCode)
+                        }
+
+                        {
+                            address.countryCode != 'AE' && (
+                                <TextField label="Postcode"
                                     required
                                     value={address.zip}
                                     onInput={value => setAddress(addr => ({ ...addr, zip: value }))}
                                     error={fieldErrors.zip}  />
+                            )
+                        }
+
                     </InlineLayout>
 
                     <BlockSpacer spacing="tight" />
