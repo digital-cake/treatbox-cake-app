@@ -44,6 +44,9 @@ class OrderProcessor
             'billing_country_code' => $order['billing_address']['country_code'] ? $order['billing_address']['country_code'] : $order['shipping_address']['country_code'],
         ];
 
+        $data_item_added = false;
+        $shipping_data_item = $line_items->firstWhere('shipping_item', true);
+
         foreach($shipping_addresses as $index => $shipping_address) {
 
             $channel_ref = "{$prefix}{$order['name']}_{$index}";
@@ -82,6 +85,18 @@ class OrderProcessor
 
             $incoming_items = collect([]);
 
+            if ($shipping_data_item && !$data_item_added) {
+                $incoming_items->push(new OrderItem([
+                    'shopify_line_id' => $shipping_data_item['id'],
+                    'item_name' => $shipping_data_item['name'],
+                    'sku' => 'SHIPPING_DATA',
+                    'quantity' => $shipping_data_item['quantity'],
+                    'price' => 0,
+                    'weight' => 0
+                ]));
+                $data_item_added = true;
+            }
+
             $order_items = $line_items->whereIn('custom_identifier', $shipping_address['item_custom_ids']);
 
             foreach($order_items as $line_item) {
@@ -116,19 +131,6 @@ class OrderProcessor
                         'weight' => $child_line_item['grams']
                     ]));
                 }
-            }
-
-            $shipping_data_item = $line_items->firstWhere('shipping_item', true);
-
-            if ($shipping_data_item && $index == 0) {
-                $incoming_items->push(new OrderItem([
-                    'shopify_line_id' => $shipping_data_item['id'],
-                    'item_name' => $shipping_data_item['name'],
-                    'sku' => 'SHIPPING_DATA',
-                    'quantity' => $shipping_data_item['quantity'],
-                    'price' => 0,
-                    'weight' => 0
-                ]));
             }
 
             $incoming_order->fill([
