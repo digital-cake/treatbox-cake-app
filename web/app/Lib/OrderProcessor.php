@@ -161,7 +161,7 @@ class OrderProcessor
             if ($shipping_methods_prop) {
                 $line_items->push([
                     'shipping_item' => true,
-                    'custom_identifier' => "SHIPPING_" . time(),
+                    'custom_identifier' => null,
                     'box' => false,
                     ...$line_item
                 ]);
@@ -254,6 +254,8 @@ class OrderProcessor
             if (is_array($address['items'])) {
                 foreach($address['items'] as $item) {
                     $custom_identifier = null;
+
+
 
                     if ($item['boxId']) {
                         $custom_identifier = $item['boxId'];
