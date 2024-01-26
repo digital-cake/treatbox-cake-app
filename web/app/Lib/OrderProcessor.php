@@ -118,11 +118,25 @@ class OrderProcessor
                 }
             }
 
+            $shipping_data_item = $line_items->firstWhere('shipping_item', true);
+
+            if ($shipping_data_item && $index == 0) {
+                $incoming_items->push(new OrderItem([
+                    'shopify_line_id' => $shipping_data_item['id'],
+                    'item_name' => $shipping_data_item['name'],
+                    'sku' => 'SHIPPING_DATA',
+                    'quantity' => $shipping_data_item['quantity'],
+                    'price' => 0,
+                    'weight' => 0
+                ]));
+            }
+
             $incoming_order->fill([
                 'subtotal' => $subtotal,
                 'total' => $subtotal + $shipping_cost,
                 'special_instructions' => self::extractSpecialInstructions($order_items)
             ]);
+
 
             $incoming_order->save();
             $incoming_order->items()->saveMany($incoming_items);
@@ -142,7 +156,16 @@ class OrderProcessor
             * is only present because it contains information about the shipping method applied to an address */
             $shipping_methods_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_shipping_methods');
 
-            if ($shipping_methods_prop) continue;
+            if ($shipping_methods_prop) {
+                $line_items->push([
+                    'shipping_item' => true,
+                    'custom_identifier' => "SHIPPING_" . time(),
+                    'box' => false,
+                    ...$line_item
+                ]);
+
+                continue;
+            }
 
             $custom_identifier = null;
 
@@ -161,6 +184,7 @@ class OrderProcessor
             if (!$custom_identifier) continue;
 
             $line_item = [
+                'shipping_item' => false,
                 'custom_identifier' => $custom_identifier,
                 'box' => false,
                 ...$line_item
