@@ -129,7 +129,7 @@ export default function Orders() {
                                 {title: 'Order'},
                                 {title: 'Channel Ref'},
                                 {title: 'Click & Drop ID'},
-                                {title: 'Order Date'},
+                                {title: 'Order Date/Time'},
                                 {title: 'Recipient'},
                                 {title: 'Items'},
                                 {title: 'Status'}
@@ -159,7 +159,7 @@ export default function Orders() {
                                         </IndexTable.Cell>
 
                                         <IndexTable.Cell>
-                                            {moment(new Date(order.created_at)).format('ddd Do MMM YYYY')}
+                                            {moment(new Date(order.created_at)).format('ddd Do MMM YYYY HH:mm')}
                                         </IndexTable.Cell>
 
                                         <IndexTable.Cell>
