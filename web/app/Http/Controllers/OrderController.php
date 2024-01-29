@@ -34,7 +34,7 @@ class OrderController extends Controller
         return [
             'has_previous_page' => $page > 1,
             'has_next_page' => ($limit * $page) < $order_total_count,
-            'order_total_count' => $order_total_count,
+            'total_pages' => ceil($order_total_count / $limit),
             'orders' => $orders
         ];
     }

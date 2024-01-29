@@ -7,6 +7,7 @@ import {
     Card,
     Tag,
     VerticalStack,
+    HorizontalStack,
     useIndexResourceState,
     useSetIndexFiltersMode,
     IndexFiltersMode,
@@ -45,6 +46,7 @@ export default function Orders() {
 
     const app = useAppBridge();
 
+    const [totalPages, setTotalPages] = useState(1);
     const [hasNextPage, setHasNextPage] = useState(true);
     const [page, setPage] = useState(1);
     const [orders, setOrders] = useState([]);
@@ -85,6 +87,7 @@ export default function Orders() {
             setOrders(response.orders);
             setHasNextPage(response.has_next_page);
             setOrdersLoading(false);
+            setTotalPages(response.total_pages);
         });
 
     }, [page, refreshKey]);
@@ -181,22 +184,35 @@ export default function Orders() {
                     </Card>
                 </Layout.Section>
                 <Layout.Section>
-                    <VerticalStack inlineAlign="end">
-                        <ButtonGroup>
+                    <HorizontalStack align="end"
+                                       blockAlign="center"
+                                       gap="4">
+
+
                             {
-                                ordersLoading && (
+                                ordersLoading ? (
                                     <Spinner size="small" />
+                                ) : (
+                                    <Text>Page {page} of {totalPages}</Text>
                                 )
                             }
 
-                            <Button icon={ChevronLeftMinor}
-                                    disabled={page < 2}
-                                    onClick={() => setPage(page - 1)} />
-                            <Button icon={ChevronRightMinor}
-                                    disabled={!hasNextPage}
-                                    onClick={() => setPage(page + 1)} />
-                        </ButtonGroup>
-                    </VerticalStack>
+                            {
+                                !ordersLoading && (
+                                    <ButtonGroup>
+                                        <Button icon={ChevronLeftMinor}
+                                                disabled={page < 2}
+                                                onClick={() => setPage(page - 1)} />
+                                        <Button icon={ChevronRightMinor}
+                                                disabled={!hasNextPage}
+                                                onClick={() => setPage(page + 1)} />
+                                   </ButtonGroup>
+                                )
+                            }
+
+
+
+                    </HorizontalStack>
                 </Layout.Section>
                 <Layout.Section>
                     <p>&nbsp;</p>
