@@ -30,7 +30,7 @@ class ShopifyCarrierServiceCallbackController extends Controller
 
         if (!$shipping_data_line_item) {
 
-            $country_code = $rate['origin']['country'];
+            $country_code = $rate['destination']['country'];
 
             $shipping_rates = ShippingRate::where('countries', 'LIKE', "%{$country_code}%")
                                             ->where('shop', $shop)
