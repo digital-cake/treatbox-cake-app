@@ -20858,10 +20858,13 @@ ${errorInfo.componentStack}`);
     function onAddressSubmit() {
       setFieldErrors({});
       const requiredFields = ["lastName", "address1", "city", "country"];
-      if (address.countryCode != "AE") {
+      if (address.countryCode == "AE") {
         address.zip = null;
-        requiredFields.push("zip");
+        requiredFields.push("province");
       } else {
+        requiredFields.push("zip");
+      }
+      if (["AE", "AU", "CA", "US"].includes(address.countryCode)) {
         requiredFields.push("province");
       }
       const newFieldErrors = {};

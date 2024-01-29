@@ -18,7 +18,22 @@ class OrderProcessor
     public static function process(string $shop, array $order) : void
     {
 
+        if (!is_array($order['shipping_lines']) && count($order['shipping_lines']) < 1) {
+            return;
+        }
+
+        if ($order['source_name'] == 'subscription_contract') {
+            return;
+        }
+
         if (empty($order['shipping_address'])) return;
+
+        $subscription_line_item = Arr::first($order['line_items'], function ($line_item) {
+            $lc_name = strtolower($line_item['name']);
+            return Str::contains($lc_name, 'subscribe') || Str::contains($lc_name, 'subscription');
+        });
+
+        if ($subscription_line_item) return;
 
         $prefix = SettingOption::where('shop', $shop)
                     ->where('name', 'click_and_drop_channel_ref_prefix')
