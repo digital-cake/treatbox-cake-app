@@ -183,7 +183,18 @@ class OrderProcessor
                 $custom_identifier = $id_prop['value'];
             }
 
-            if (!$custom_identifier) continue;
+            if (!$custom_identifier) {
+                //Handle legacy box properties
+                $box_bool_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box' && $prop['value'] == 'true');
+
+                if (!$box_bool_prop) continue;
+
+                $id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box_id');
+
+                if (!$id_prop) continue;
+
+                $custom_identifier = $id_prop['value'];
+            }
 
             $line_item = [
                 'shipping_item' => false,
@@ -202,6 +213,10 @@ class OrderProcessor
                     if (!$box_id_prop) return false;
 
                     if ($box_id_prop['value'] != $id_prop['value']) return false;
+
+                    $box_bool_prop = Arr::first($item['properties'], fn ($prop) => $prop['name'] == '_box' && $prop['value'] == 'true');
+
+                    if ($box_bool_prop) return false;
 
                     return true;
                 });

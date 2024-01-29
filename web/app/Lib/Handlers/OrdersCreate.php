@@ -23,6 +23,7 @@ class OrdersCreate implements Handler
             return;
         }
 
+
         try {
             OrderProcessor::process($shop, $order);
         } catch(Exception $e) {
