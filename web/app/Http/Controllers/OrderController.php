@@ -20,14 +20,15 @@ class OrderController extends Controller
 
         if ($page < 1) $page = 1;
 
-        $limit = 30;
-        $offset = ($page - 1) * 30;
+        $limit = 50;
+        $offset = ($page - 1) * 50;
 
         $order_total_count = Order::where('shop', $session->getShop())->count();
 
         $orders = Order::where('shop', $session->getShop())
                         ->limit($limit)
                         ->offset($offset)
+                        ->orderBy('order_date', 'desc')
                         ->get();
 
         return [
