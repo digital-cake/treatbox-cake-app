@@ -20,8 +20,8 @@ class OrderController extends Controller
 
         if ($page < 1) $page = 1;
 
-        $limit = 50;
-        $offset = ($page - 1) * 50;
+        $limit = 2;
+        $offset = ($page - 1) * 2;
 
         $order_total_count = Order::where('shop', $session->getShop())->count();
 
@@ -32,7 +32,9 @@ class OrderController extends Controller
                         ->get();
 
         return [
+            'has_previous_page' => $page > 1,
             'has_next_page' => ($limit * $page) < $order_total_count,
+            'order_total_count' => $order_total_count,
             'orders' => $orders
         ];
     }

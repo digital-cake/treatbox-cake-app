@@ -13,8 +13,19 @@ import {
     IndexFilters,
     DatePicker,
     Tooltip,
-    Tabs
+    Tabs,
+    ButtonGroup,
+    Button,
+    Box,
+    Spinner,
+    Icon,
 } from "@shopify/polaris";
+
+import {
+    ChevronRightMinor,
+    ChevronLeftMinor,
+    RefreshMajor
+} from '@shopify/polaris-icons';
 
 import { useEffect, useState, useCallback } from "react";
 
@@ -38,6 +49,7 @@ export default function Orders() {
     const [page, setPage] = useState(1);
     const [orders, setOrders] = useState([]);
     const [ordersLoading, setOrdersLoading] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(new Date().getTime());
 
     const navigate = useNavigate();
 
@@ -66,18 +78,16 @@ export default function Orders() {
 
     useEffect(() => {
 
-        if (!hasNextPage) return;
-
         setOrdersLoading(true);
 
         getOrders(page)
         .then((response) => {
             setOrders(response.orders);
-            setOrdersLoading(false);
             setHasNextPage(response.has_next_page);
+            setOrdersLoading(false);
         });
 
-    }, [page, hasNextPage]);
+    }, [page, refreshKey]);
 
     const renderStatus = (order) => {
         if (!order.tracking_number) {
@@ -93,6 +103,16 @@ export default function Orders() {
     return (
         <Page
             title="Orders"
+            secondaryActions={[
+                {
+                    content: (<Icon source={RefreshMajor} />),
+                    onAction: () => {
+                        setOrders([]);
+                        setPage(1);
+                        setRefreshKey(new Date().getTime())
+                    }
+                }
+            ]}
             backAction={{
                 content: "Home",
                 url: "/"
@@ -114,6 +134,7 @@ export default function Orders() {
                                 {title: 'Items'},
                                 {title: 'Status'}
                             ]}
+                            hasZebraStriping
                             >
                             {
                                 orders.map((order, index) => (
@@ -158,6 +179,27 @@ export default function Orders() {
                             }
                         </IndexTable>
                     </Card>
+                </Layout.Section>
+                <Layout.Section>
+                    <VerticalStack inlineAlign="end">
+                        <ButtonGroup>
+                            {
+                                ordersLoading && (
+                                    <Spinner size="small" />
+                                )
+                            }
+
+                            <Button icon={ChevronLeftMinor}
+                                    disabled={page < 2}
+                                    onClick={() => setPage(page - 1)} />
+                            <Button icon={ChevronRightMinor}
+                                    disabled={!hasNextPage}
+                                    onClick={() => setPage(page + 1)} />
+                        </ButtonGroup>
+                    </VerticalStack>
+                </Layout.Section>
+                <Layout.Section>
+                    <p>&nbsp;</p>
                 </Layout.Section>
             </Layout>
         </Page>
