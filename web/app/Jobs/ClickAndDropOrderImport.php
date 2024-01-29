@@ -125,6 +125,8 @@ class ClickAndDropOrderImport implements ShouldQueue
                 $this->order->click_and_drop_id = $created_order['orderIdentifier'];
                 $this->order->save();
             }
+        } else {
+            Log::channel('slack')->error("Unexpected response from click and drop API", [ 'response' => json_encode($response, JSON_PRETTY_PRINT) ]);
         }
 
     }
