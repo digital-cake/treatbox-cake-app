@@ -113,7 +113,7 @@ class ClickAndDropOrderImport implements ShouldQueue
                 'SKU' => $sku,
                 'quantity' => $order_item->quantity,
                 'unitValue' => $order_item->price,
-                'unitWeightInGrams' => $order_item->weight
+                'unitWeightInGrams' => $weight
             ];
         }
 
