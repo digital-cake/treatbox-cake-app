@@ -96,24 +96,16 @@ class ClickAndDropOrderImport implements ShouldQueue
 
         foreach($order_items as $index => $order_item) {
 
-            $item['packages'][0]['weightInGrams'] += ($order_item->weight * $order_item->quantity);
+            $item['packages'][0]['weightInGrams'] += $order_item->quantity;
 
             $sku = Str::random(3) . $index;
-
-            $weight = $order_item->weight;
-
-            if ($weight > 3000) {
-                $weight = 3000;
-            } else if ($weight < 1) {
-                $weight = 1;
-            }
 
             $item['packages'][0]['contents'][] = [
                 'name' => Str::limit($order_item->item_name, 800, ""),
                 'SKU' => $sku,
                 'quantity' => $order_item->quantity,
                 'unitValue' => $order_item->price,
-                'unitWeightInGrams' => $weight
+                'unitWeightInGrams' => 1
             ];
         }
 
@@ -134,7 +126,7 @@ class ClickAndDropOrderImport implements ShouldQueue
                 $this->order->save();
             }
         } else {
-            Log::stack(['single', 'slack'])->error("Unexpected response from click and drop API", [ 'response_errors' => isset($response['errors']) ? $response['errors'] : null, 'response' => $response ]);
+            Log::stack(['single', 'slack'])->error("Unexpected response from click and drop API", [ 'response errors' => isset($response['errors']) ? $response['errors'] : null, 'response' => $response ]);
         }
 
     }
