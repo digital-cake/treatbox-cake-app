@@ -100,6 +100,14 @@ class ClickAndDropOrderImport implements ShouldQueue
 
             $sku = Str::random(3) . $index;
 
+            $weight = $order_item->weight;
+
+            if ($weight > 3000) {
+                $weight = 3000;
+            } else if ($weight < 1) {
+                $weight = 1;
+            }
+
             $item['packages'][0]['contents'][] = [
                 'name' => Str::limit($order_item->item_name, 800, ""),
                 'SKU' => $sku,
