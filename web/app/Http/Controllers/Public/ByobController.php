@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ByobController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('cors');
+    }
+
     public function generateSessionId()
     {
         return [
