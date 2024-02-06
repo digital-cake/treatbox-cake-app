@@ -40,6 +40,8 @@ Route::controller(ByobController::class)->group(function() {
     Route::post('/byob/save', 'saveBoxData');
     Route::post('/byob/delete', 'deleteBoxData');
 
-    Route::options('/byob/*', 'preflight');
+    Route::options('/byob/session-id', 'preflight');
+    Route::options('/byob/save', 'preflight');
+    Route::options('/byob/delete', 'preflight');
 });
 
