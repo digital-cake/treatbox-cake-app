@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\ShippingRate;
+use App\Http\Controllers\Public\ByobController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,5 +33,11 @@ Route::get('/shipping-rates', function (Request $request) {
         'rates' => $shipping_rates
     ], 200);
 
+});
+
+Route::controller(ByobController::class)->group(function() {
+    Route::post('/byob/session-id', 'generateSessionId');
+    Route::post('/byob/save', 'saveBoxData');
+    Route::post('/byob/delete', 'deleteBoxData');
 });
 
