@@ -16,6 +16,11 @@ class ByobController extends Controller
         $this->middleware('cors');
     }
 
+    public function preflight()
+    {
+        return "OK";
+    }
+
     public function generateSessionId()
     {
         return [

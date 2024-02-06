@@ -39,5 +39,7 @@ Route::controller(ByobController::class)->group(function() {
     Route::post('/byob/session-id', 'generateSessionId');
     Route::post('/byob/save', 'saveBoxData');
     Route::post('/byob/delete', 'deleteBoxData');
+
+    Route::options('/byob/*', 'preflight');
 });
 
