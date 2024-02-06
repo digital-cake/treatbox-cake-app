@@ -24,7 +24,7 @@ class AccessControlHeaders
             $response = $next($request);
 
             $response->headers->set("Access-Control-Allow-Origin", "*");
-            $response->headers->set("Access-Control-Allow-Headers", "*");
+            $response->headers->set("Access-Control-Allow-Header", "Authorization");
             $response->headers->set("Access-Control-Expose-Headers", 'X-Shopify-API-Request-Failure-Reauthorize-Url');
 
             return $response;
