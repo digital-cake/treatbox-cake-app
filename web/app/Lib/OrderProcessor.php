@@ -98,6 +98,10 @@ class OrderProcessor
 
             $incoming_order->fill($billing_address);
 
+            $order_items = $line_items->whereIn('custom_identifier', $shipping_address['item_custom_ids']);
+
+            if ($order_items->count() < 1) continue;
+
             $incoming_items = collect([]);
 
             if ($shipping_data_item && !$data_item_added) {
@@ -111,8 +115,6 @@ class OrderProcessor
                 ]));
                 $data_item_added = true;
             }
-
-            $order_items = $line_items->whereIn('custom_identifier', $shipping_address['item_custom_ids']);
 
             foreach($order_items as $line_item) {
 
@@ -153,7 +155,6 @@ class OrderProcessor
                 'total' => $subtotal + $shipping_cost,
                 'special_instructions' => self::extractSpecialInstructions($order_items)
             ]);
-
 
             $incoming_order->save();
             $incoming_order->items()->saveMany($incoming_items);
