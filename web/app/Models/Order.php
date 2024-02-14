@@ -21,6 +21,7 @@ class Order extends Model
         'recipient_company',
         'recipient_address1',
         'recipient_address2',
+        'recipient_company',
         'recipient_city',
         'recipient_county',
         'recipient_postcode',

@@ -55,6 +55,7 @@ class ClickAndDropOrderImport implements ShouldQueue
                     'companyName' => $this->order->recipient_company ? $this->order->recipient_company : "",
                     'addressLine1' => Str::limit($this->order->recipient_address1, 97),
                     'addressLine2' => $this->order->recipient_address2 ? Str::limit($this->order->recipient_address2, 97) : "",
+                    'companyName' => $this->order->recipient_company ? Str::limit($this->order->recipient_company, 97) : "",
                     'city' => $this->order->recipient_city,
                     'county' => $this->order->recipient_county,
                     'postcode' => !empty($this->order->recipient_postcode) ? $this->order->recipient_postcode : 'N/a',

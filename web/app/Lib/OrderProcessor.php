@@ -90,6 +90,7 @@ class OrderProcessor
                 'recipient_name' => $shipping_address['name'],
                 'recipient_address1' => $shipping_address['address1'],
                 'recipient_address2' => $shipping_address['address2'],
+                'recipient_company' => !empty($shipping_address['company']) ? $shipping_address['company'] : null,
                 'recipient_city' => $shipping_address['city'],
                 'recipient_county' => $shipping_address['county'],
                 'recipient_postcode' => $shipping_address['postcode'],
