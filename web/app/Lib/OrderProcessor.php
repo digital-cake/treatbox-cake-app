@@ -279,6 +279,7 @@ class OrderProcessor
                 'county' => $address['province'],
                 'postcode' => $address['zip'],
                 'country_code' => $address['countryCode'],
+                'company' => !empty($address['company']) ? $address['company'] : null,
                 'item_custom_ids' => [],
                 'shipping_rate_id' => isset($shipping_method_allocation[$address['id']]) ? $shipping_method_allocation[$address['id']] : null
             ];
@@ -312,6 +313,7 @@ class OrderProcessor
             'county' => $order['shipping_address']['province'],
             'postcode' => $order['shipping_address']['zip'],
             'country_code' => $order['shipping_address']['country_code'],
+            'company' =>  $order['shipping_address']['company'],
             'shipping_rate_id' => isset($shipping_method_allocation['primary']) ? $shipping_method_allocation['primary'] : null,
             'item_custom_ids' => $custom_line_item_ids->diff($additional_address_item_custom_ids)
         ];
