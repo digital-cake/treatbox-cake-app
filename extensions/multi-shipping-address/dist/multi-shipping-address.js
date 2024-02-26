@@ -20876,6 +20876,9 @@ ${errorInfo.componentStack}`);
       if (!address.shippingMethod) {
         newFieldErrors.shippingMethod = "You must choose a shipping method for this address";
       }
+      if (address.items.length < 1) {
+        newFieldErrors.items = "You must select at least one item to ship to this address";
+      }
       if (Object.values(newFieldErrors).length > 0) {
         setFieldErrors(newFieldErrors);
         return;
@@ -21110,7 +21113,8 @@ ${errorInfo.componentStack}`);
                     },
                     line.id
                   );
-                }) })
+                }) }),
+                fieldErrors.items && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { appearance: "critical", children: fieldErrors.items })
               ] }) }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, { spacing: "tight" }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
@@ -21575,3 +21579,4 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
+//# sourceMappingURL=multi-shipping-address.js.map

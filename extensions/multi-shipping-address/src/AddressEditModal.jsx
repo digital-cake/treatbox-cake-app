@@ -86,6 +86,11 @@ export default function AddressEditModal(props) {
             newFieldErrors.shippingMethod = "You must choose a shipping method for this address";
         }
 
+        if (address.items.length < 1) {
+            newFieldErrors.items = "You must select at least one item to ship to this address";
+        }
+
+
         if (Object.values(newFieldErrors).length > 0) {
             setFieldErrors(newFieldErrors);
             return;
@@ -319,6 +324,11 @@ export default function AddressEditModal(props) {
                                     })
                                 }
                             </BlockStack>
+                            {
+                                fieldErrors.items && (
+                                    <Text appearance="critical">{fieldErrors.items}</Text>
+                                )
+                            }
                         </BlockStack>
                     </View>
 
