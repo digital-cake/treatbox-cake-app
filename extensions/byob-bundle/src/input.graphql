@@ -1,0 +1,20 @@
+query Input {
+  cart {
+    lines {
+      id
+      quantity
+      idAttr: attribute(key: "_id") {
+        value
+      }
+      boxIdAttr: attribute(key: "_box_id") {
+        value
+      }
+      merchandise {
+        __typename
+        ... on ProductVariant {
+            id
+        }
+      }
+    }
+  }
+}

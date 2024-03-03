@@ -1,2 +1,3 @@
-dist
-generated
+/target
+Cargo.lock
+*.output.graphql
