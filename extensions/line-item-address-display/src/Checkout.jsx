@@ -47,13 +47,6 @@ function Extension() {
             }
 
             if (!identifier) {
-
-                const result = await applyCartLinesChange({
-                    type: 'updateCartLine',
-                    id: cartLine.id,
-                    attributes: [ ...cartLine.attributes, { key: '_ts', value: Math.ceil(new Date().getTime() / 1000).toString() }]
-                });
-
                 return;
             }
 

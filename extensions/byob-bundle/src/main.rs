@@ -13,7 +13,7 @@ struct BoxLineItem {
 fn run(_input: input::ResponseData) -> Result<output::FunctionResult> {
     let no_changes = output::FunctionResult { operations: vec![] };
 
-    //Filter box line items
+    //Filter and map cart items into BoxLineItem vector
     let box_line_items: Vec<BoxLineItem> = _input.cart.lines.iter().filter_map(|line| 
         match &line.id_attr {
             Some(attribute) => match &attribute.value {
