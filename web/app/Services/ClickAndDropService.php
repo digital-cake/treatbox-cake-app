@@ -60,8 +60,6 @@ class ClickAndDropService
     public function getOrdersPaged(array $query_parameters, \Closure $callback)
     {
 
-        $query_parameters = [];
-
         while (true) {
 
             $response = $this->makeRequest('/api/v1/orders', 'GET', $query_parameters);
@@ -71,7 +69,7 @@ class ClickAndDropService
 
             if (!isset($response['continuationToken'])) break;
 
-            $query_parameters = ['continuationToken' => $response['continuationToken']];
+            $query_parameters['continuationToken'] = $response['continuationToken'];
 
         }
 
