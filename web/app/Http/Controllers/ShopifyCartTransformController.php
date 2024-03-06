@@ -33,10 +33,9 @@ class ShopifyCartTransformController extends Controller
             ], 500);
         }
 
-        $functions = collect($functions_response_data['data']['shopifyFunctions']['nodes']);
-        $function = $functions->first(fn ($function) => $function['title'] == $function_name);
+        $functions = collect($functions_response_data['data']['shopifyFunctions']['nodes'])->filter(fn ($function) => $function['title'] == $function_name);
 
-        if (!$function) {
+        if ($functions->count() < 1) {
             return response([
                 'server_error' => "No function exists with name \"{$function_name}\""
             ], 404);
@@ -44,7 +43,7 @@ class ShopifyCartTransformController extends Controller
 
         $cart_transforms = collect($cart_transforms_response_data['data']['cartTransforms']['nodes']);
 
-        $cart_transform = $cart_transforms->first(fn ($transform) => $transform['functionId'] == $function['id']);
+        $cart_transform = $cart_transforms->whereIn('functionId', $functions->pluck('id'))->first();
 
         return response([
             'cart_transform' => $cart_transform

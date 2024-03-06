@@ -19582,11 +19582,6 @@ ${errorInfo.componentStack}`);
           identifier = boxIdAttr.value;
         }
         if (!identifier) {
-          const result = yield applyCartLinesChange({
-            type: "updateCartLine",
-            id: cartLine.id,
-            attributes: [...cartLine.attributes, { key: "_ts", value: Math.ceil((/* @__PURE__ */ new Date()).getTime() / 1e3).toString() }]
-          });
           return;
         }
         const additionalAddressCartAttr = attributes.find((attr) => attr.key == "__additional_addresses");

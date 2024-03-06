@@ -20,7 +20,7 @@ import { getSessionToken } from "@shopify/app-bridge/utilities";
 import { useAppBridge } from "@shopify/app-bridge-react";
 
 import CarrierServiceOptionLayoutSection from "../components/CarrierServiceOptionLayoutSection";
-import ByobBundlesOptionLayoutSection from "../components/ByobBundlesOptionLayoutSection";
+import CartTransformFunctionOptionLayourSection from "../components/CartTransformFunctionOptionLayourSection";
 
 export default function SettingsPage() {
 
@@ -118,9 +118,6 @@ export default function SettingsPage() {
         setSettingOptions(newSettingOptions);
     }
 
-
-
-
     return (
         <Frame>
             <Page
@@ -137,7 +134,22 @@ export default function SettingsPage() {
                         <Divider />
                     </Layout.Section>
 
-                    <ByobBundlesOptionLayoutSection
+                    <CartTransformFunctionOptionLayourSection
+                        heading="Build your own box bundle"
+                        functionName="byob-bundle"
+                        functionTitle="BYOB Bundle"
+                        activeMessage="Build your own box items will be merged and appear as a single line item to customers"
+                        inactiveMessage="Build your own box items will not appear as a single line item to customers"
+                        info={`Enable/disable "Build your own box" cart transform function on your store.\nThis must be enabled for "Build your own box" products and their items to appear as a single item`}
+                        displayToast={displayToast} />
+
+                    <CartTransformFunctionOptionLayourSection
+                        heading="Build your own box bundle (V2)"
+                        functionName="byob-bundle-expand"
+                        functionTitle="BYOB Bundle V2"
+                        activeMessage="Build your own box items will be expanded into multiple items from their line item property values"
+                        inactiveMessage="Build your own box items will not be expanded into multiple items"
+                        info={`Enable/disable "Build your own box" cart transform function on your store.\nThis must be enabled for "Build your own box" products and their items to appear as a bundle item`}
                         displayToast={displayToast} />
 
                     <Layout.Section fullWidth>
