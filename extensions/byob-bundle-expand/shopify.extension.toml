@@ -1,0 +1,20 @@
+api_version = "2024-01"
+
+[[extensions]]
+handle = "byob-bundle-expand"
+name = "t:name"
+description = "t:description"
+type = "function"
+
+  [[extensions.targeting]]
+  target = "purchase.cart-transform.run"
+  input_query = "src/input.graphql"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/byob-bundle-expand.wasm"
+  watch = [ "src/**/*.rs" ]
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"
