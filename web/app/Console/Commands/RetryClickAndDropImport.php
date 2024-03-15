@@ -75,6 +75,9 @@ class RetryClickAndDropImport extends Command
                 $response = $response->json();
 
                 foreach($response as $cad_order) {
+
+                    if (!isset($cad_order['orderReference'])) continue;
+
                     $order = $orders->firstWhere("channel_reference", $cad_order['orderReference']);
 
                     if (!$order) continue;

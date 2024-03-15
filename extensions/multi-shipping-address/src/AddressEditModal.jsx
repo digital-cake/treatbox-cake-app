@@ -279,31 +279,31 @@ export default function AddressEditModal(props) {
                                                         <ProductThumbnail source={line.merchandise.image.url} opacity />
 
                                                         <View>
-                                                        <Text key={line.id}>{line.merchandise.title}</Text>
-                                                        {
-                                                            line.lineComponents && line.lineComponents.length > 0 && (
-                                                                <>
-                                                                    <BlockSpacer />
-                                                                    <List>
-                                                                        {
-                                                                            line.lineComponents.map((componentLine, index) => {
+                                                            <Text key={line.id}>{line.merchandise.title}</Text>
+                                                            {
+                                                                line.lineComponents && line.lineComponents.length > 0 && (
+                                                                    <>
+                                                                        <BlockSpacer />
+                                                                        <List>
+                                                                            {
+                                                                                line.lineComponents.map((componentLine, index) => {
 
-                                                                                if (componentLine.merchandise.id == line.merchandise.id) return null;
+                                                                                    if (componentLine.merchandise.id == line.merchandise.id) return null;
 
-                                                                                return (
-                                                                                    <ListItem key={`line-${line.id}-${index}`}>
-                                                                                        {componentLine.merchandise.title}
-                                                                                    </ListItem>
-                                                                                )
+                                                                                    return (
+                                                                                        <ListItem key={`line-${line.id}-${index}`}>
+                                                                                            {componentLine.merchandise.title}
+                                                                                        </ListItem>
+                                                                                    )
 
-                                                                            })
-                                                                        }
+                                                                                })
+                                                                            }
 
-                                                                    </List>
-                                                                </>
+                                                                        </List>
+                                                                    </>
 
-                                                            )
-                                                        }
+                                                                )
+                                                            }
                                                         </View>
 
 
