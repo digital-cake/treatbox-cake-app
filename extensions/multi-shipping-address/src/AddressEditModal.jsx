@@ -111,10 +111,14 @@ export default function AddressEditModal(props) {
             ts = tsAttr.value;
         }
 
-        if (Array.isArray(line.lineComponents) && line.lineComponents.length > 0) {
+        let boxAttr = line.attributes.find(attr => attr.key == '_id');
+
+        if (boxAttr) {
+            boxId = boxAttr.value;
+        } else if (Array.isArray(line.lineComponents) && line.lineComponents.length > 0) {
 
             for (let i = 0; i < line.lineComponents.length; i++) {
-                const boxAttr = line.lineComponents[i].attributes.find(attr => attr.key == '_id' || attr.value == '__box_id');
+                boxAttr = line.lineComponents[i].attributes.find(attr => attr.key == '_id' || attr.value == '__box_id');
 
                 if (!boxAttr) continue;
 
@@ -146,6 +150,35 @@ export default function AddressEditModal(props) {
         }
 
         return false;
+    }
+
+    function isLineBoxItem(line) {
+        return line.attributes.findIndex(attr => attr.key == '_box_id') !== -1;
+    }
+
+    function renderLineItemAttr(line, attrName) {
+        const attr = line.attributes.find(attr => attr.key == attrName);
+
+        if (!attr || !attr.value) return null;
+
+        let attrLines = attr.value.split("\n");
+
+        return (
+            <>
+                <BlockSpacer />
+                <List>
+                    {
+                        attrLines.map((attrLine, index) => {
+                            if (!attrLine) return null;
+                            return (
+                                <ListItem key={`attr-${line.id}-${attrName}-${index}`}>{attrLine}</ListItem>
+                            )
+                        })
+                    }
+                </List>
+            </>
+        )
+
     }
 
     function onDeliveryMethodChange(value, rateName) {
@@ -263,6 +296,8 @@ export default function AddressEditModal(props) {
 
                                         if (lineItemAssignedToOtherAddress(line.id)) return null;
 
+                                        if (isLineBoxItem(line)) return null;
+
                                         return (
                                             <Pressable  border="base"
                                                         cornerRadius="base"
@@ -280,6 +315,9 @@ export default function AddressEditModal(props) {
 
                                                         <View>
                                                             <Text key={line.id}>{line.merchandise.title}</Text>
+                                                            {
+                                                                renderLineItemAttr(line, 'Box Items')
+                                                            }
                                                             {
                                                                 line.lineComponents && line.lineComponents.length > 0 && (
                                                                     <>

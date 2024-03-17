@@ -50,7 +50,9 @@ function Extension() {
     const dataVariantId = settings.shipping_data_variant || 'gid://shopify/ProductVariant/47534018953535';
 
     const cartLines = useCartLines();
-    const shippableCartLines  = cartLines.filter(line => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);
+    const shippableCartLines  = extractShippableCartLines(cartLines);
+
+    console.log(shippableCartLines);
 
     const [shippingCountries, setShippingCountries] = useState([]);
     const [additionalAddressEdit, setAdditionalAddressEdit] = useState({});
@@ -68,6 +70,7 @@ function Extension() {
     const applyCartLinesChange = useApplyCartLinesChange();
 
     useEffect(() => {
+        
 
         // applyAttributeChange({
         //     type: 'updateAttribute',
@@ -144,7 +147,7 @@ function Extension() {
             const addressAssignedCartLines = additionalAddresses.map(addr => addr.items.map(item => item.lineId)).flat(1);
             const primaryAddressLineItems = shippableCartLines.filter(line => !addressAssignedCartLines.includes(line.id));
 
-            if (primaryAddressLineItems && !selectedShippingMethods.primary) {
+            if (primaryAddressLineItems.length > 0 && !selectedShippingMethods.primary) {
                 return {
                     behavior: 'block',
                     reason: "No shipping method selected",
@@ -161,6 +164,22 @@ function Extension() {
             behavior: 'allow',
         };
     })
+
+    function extractShippableCartLines(cartLines) {
+        let lines = [];
+
+        for (let i = 0; i < cartLines.length; i++) {
+            if (!cartLines[i].merchandise.requiresShipping || cartLines[i].merchandise.id == dataVariantId) continue;
+
+            const boxIdAttr = cartLines[i].attributes.find(attr => attr.key == '_box_id');
+
+            if (boxIdAttr) continue;
+
+            lines.push(cartLines[i]);
+        }
+
+        return lines;
+    }
 
     function addressToString(address, delimiter) {
 

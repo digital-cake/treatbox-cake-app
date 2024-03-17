@@ -20893,9 +20893,12 @@ ${errorInfo.componentStack}`);
       if (tsAttr) {
         ts = tsAttr.value;
       }
-      if (Array.isArray(line.lineComponents) && line.lineComponents.length > 0) {
+      let boxAttr = line.attributes.find((attr) => attr.key == "_id");
+      if (boxAttr) {
+        boxId = boxAttr.value;
+      } else if (Array.isArray(line.lineComponents) && line.lineComponents.length > 0) {
         for (let i = 0; i < line.lineComponents.length; i++) {
-          const boxAttr = line.lineComponents[i].attributes.find((attr) => attr.key == "_id" || attr.value == "__box_id");
+          boxAttr = line.lineComponents[i].attributes.find((attr) => attr.key == "_id" || attr.value == "__box_id");
           if (!boxAttr)
             continue;
           boxId = boxAttr.value;
@@ -20920,6 +20923,23 @@ ${errorInfo.componentStack}`);
         return true;
       }
       return false;
+    }
+    function isLineBoxItem(line) {
+      return line.attributes.findIndex((attr) => attr.key == "_box_id") !== -1;
+    }
+    function renderLineItemAttr(line, attrName) {
+      const attr = line.attributes.find((attr2) => attr2.key == attrName);
+      if (!attr || !attr.value)
+        return null;
+      let attrLines = attr.value.split("\n");
+      return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(List2, { children: attrLines.map((attrLine, index) => {
+          if (!attrLine)
+            return null;
+          return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ListItem2, { children: attrLine }, `attr-${line.id}-${attrName}-${index}`);
+        }) })
+      ] });
     }
     function onDeliveryMethodChange(value, rateName) {
       const nextAddress = __spreadProps(__spreadValues({}, address), { shippingMethod: value, shippingMethodName: rateName });
@@ -21064,6 +21084,8 @@ ${errorInfo.componentStack}`);
                   var _a;
                   if (lineItemAssignedToOtherAddress(line.id))
                     return null;
+                  if (isLineBoxItem(line))
+                    return null;
                   return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                     Pressable2,
                     {
@@ -21088,6 +21110,7 @@ ${errorInfo.componentStack}`);
                                   /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ProductThumbnail2, { source: line.merchandise.image.url, opacity: true }),
                                   /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(View2, { children: [
                                     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text2, { children: line.merchandise.title }, line.id),
+                                    renderLineItemAttr(line, "Box Items"),
                                     line.lineComponents && line.lineComponents.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
                                       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BlockSpacer2, {}),
                                       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(List2, { children: line.lineComponents.map((componentLine, index) => {
@@ -21167,7 +21190,8 @@ ${errorInfo.componentStack}`);
     const settings = useSettings();
     const dataVariantId = settings.shipping_data_variant || "gid://shopify/ProductVariant/47534018953535";
     const cartLines = useCartLines();
-    const shippableCartLines = cartLines.filter((line) => line.merchandise.requiresShipping && line.merchandise.id != dataVariantId);
+    const shippableCartLines = extractShippableCartLines(cartLines);
+    console.log(shippableCartLines);
     const [shippingCountries, setShippingCountries] = (0, import_react38.useState)([]);
     const [additionalAddressEdit, setAdditionalAddressEdit] = (0, import_react38.useState)({});
     const [addressSaving, setAddressSaving] = (0, import_react38.useState)(false);
@@ -21234,7 +21258,7 @@ ${errorInfo.componentStack}`);
       if (canBlockProgress) {
         const addressAssignedCartLines2 = additionalAddresses.map((addr) => addr.items.map((item) => item.lineId)).flat(1);
         const primaryAddressLineItems2 = shippableCartLines.filter((line) => !addressAssignedCartLines2.includes(line.id));
-        if (primaryAddressLineItems2 && !selectedShippingMethods.primary) {
+        if (primaryAddressLineItems2.length > 0 && !selectedShippingMethods.primary) {
           return {
             behavior: "block",
             reason: "No shipping method selected",
@@ -21250,6 +21274,18 @@ ${errorInfo.componentStack}`);
         behavior: "allow"
       };
     });
+    function extractShippableCartLines(cartLines2) {
+      let lines = [];
+      for (let i = 0; i < cartLines2.length; i++) {
+        if (!cartLines2[i].merchandise.requiresShipping || cartLines2[i].merchandise.id == dataVariantId)
+          continue;
+        const boxIdAttr = cartLines2[i].attributes.find((attr) => attr.key == "_box_id");
+        if (boxIdAttr)
+          continue;
+        lines.push(cartLines2[i]);
+      }
+      return lines;
+    }
     function addressToString(address, delimiter) {
       delimiter = typeof delimiter == "string" ? delimiter : ", ";
       const addressProps = ["address1", "address2", "city", "province", "zip", "country"];
@@ -21579,3 +21615,4 @@ ${errorInfo.componentStack}`);
     ] });
   }
 })();
+//# sourceMappingURL=multi-shipping-address.js.map
