@@ -12,6 +12,29 @@ fn run(_input: input::ResponseData) -> Result<output::FunctionResult> {
 
         let mut expanded_items: Vec<output::ExpandedItem> = Vec::new();
 
+        let line_variant_id: String = match &line.merchandise {
+            input::InputCartLinesMerchandise::ProductVariant(variant) => variant.id.to_string(),
+            _ => String::from("")
+        };
+
+        if line_variant_id.is_empty() {
+            continue;
+        }
+
+        expanded_items.push(
+            output::ExpandedItem {
+                merchandise_id: line_variant_id,
+                quantity: line.quantity,
+                price: Some(output::ExpandedItemPriceAdjustment {
+                    adjustment: output::ExpandedItemPriceAdjustmentValue::FixedPricePerUnit(
+                        output::ExpandedItemFixedPricePerUnitAdjustment { 
+                            amount: line.cost.amount_per_quantity.amount
+                        }
+                    )
+                })
+            }
+        );
+
         match &line.box_items_attr {
             Some(attribute) => match &attribute.value {
                     Some(value) => {
@@ -62,13 +85,13 @@ fn get_expanded_items_from_prop_value(value: String) -> Vec<output::ExpandedItem
     return value.
         split(";")
         .filter_map(|item| {
-            let id_qty: Vec<&str> = item.split(":").collect();
+            let id_qty_price: Vec<&str> = item.split(":").collect();
 
-            if id_qty.len() < 2 {
+            if id_qty_price.len() < 2 {
                 return None;
             }
 
-            let quantity: i64 = match id_qty[1].parse() {
+            let quantity: i64 = match id_qty_price[1].parse() {
                 Ok(v) => v,
                 Err(_e) => 0
             };
@@ -77,11 +100,38 @@ fn get_expanded_items_from_prop_value(value: String) -> Vec<output::ExpandedItem
                 return None;
             }
 
-            let mut variant_id = String::from(id_qty[0]);
+            let mut variant_id = String::from(id_qty_price[0]);
 
             variant_id.insert_str(0, "gid://shopify/ProductVariant/");
 
-            return Some(output::ExpandedItem { merchandise_id: variant_id, quantity: quantity, price: None });
+            let mut expanded_item = output::ExpandedItem { merchandise_id: variant_id, quantity: quantity, price: None };
+
+            if id_qty_price.len() > 2 {
+                let price: f64 = match id_qty_price[2].parse() {
+                    Ok(v) => v,
+                    Err(_e) => 0.0
+                };
+
+                let price_decimal: f64 = price / 100.0;
+
+                expanded_item.price = Some(output::ExpandedItemPriceAdjustment {
+                    adjustment: output::ExpandedItemPriceAdjustmentValue::FixedPricePerUnit(
+                        output::ExpandedItemFixedPricePerUnitAdjustment { 
+                            amount: shopify_function::prelude::Decimal(price_decimal) 
+                        }
+                    )
+                });
+            } else {
+                expanded_item.price = Some(output::ExpandedItemPriceAdjustment {
+                    adjustment: output::ExpandedItemPriceAdjustmentValue::FixedPricePerUnit(
+                        output::ExpandedItemFixedPricePerUnitAdjustment { 
+                            amount: shopify_function::prelude::Decimal(0.0) 
+                        }
+                    )
+                });
+            }
+
+            return Some(expanded_item);
         })
         .collect();
 }

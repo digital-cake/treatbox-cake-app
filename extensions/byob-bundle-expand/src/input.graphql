@@ -2,6 +2,11 @@ query Input {
   cart {
     lines {
       id
+      cost {
+        amountPerQuantity {
+          amount
+        }
+      }
       quantity
       boxItemsAttr: attribute(key: "_box_items") {
         value
