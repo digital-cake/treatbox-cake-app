@@ -47,6 +47,21 @@ class ClickAndDropOrderImport implements ShouldQueue
 
         $click_and_drop = new ClickAndDropService($click_and_drop_api_key);
 
+        $response = $click_and_drop->getOrders('"' . urlencode($this->order->channel_reference) . '"');
+        $response = $response->json();
+
+        foreach($response as $cad_order) {
+            if (empty($cad_order['orderReference'])) continue;
+
+            if ($cad_order['orderReference'] != $this->order->click_and_drop_id) continue;
+
+            $this->order->click_and_drop_id = $cad_order['orderIdentifier'];
+
+            $this->order->save();
+
+            return;
+        }
+
         $item = [
             'orderReference' => $this->order->channel_reference,
             'recipient' => [

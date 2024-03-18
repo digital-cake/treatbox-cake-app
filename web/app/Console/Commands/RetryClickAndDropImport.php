@@ -66,27 +66,6 @@ class RetryClickAndDropImport extends Command
             ->with('items')
             ->chunk(100, function($orders) use ($click_and_drop) {
 
-                $channel_references = $orders->map(function($item, $key) {
-                    return '"' . urlencode($item->channel_reference) . '"';
-                });
-
-                $response = $click_and_drop->getOrders($channel_references->join(";"));
-
-                $response = $response->json();
-
-                foreach($response as $cad_order) {
-
-                    if (!isset($cad_order['orderReference'])) continue;
-
-                    $order = $orders->firstWhere("channel_reference", $cad_order['orderReference']);
-
-                    if (!$order) continue;
-
-                    $order->click_and_drop_id = $cad_order['orderIdentifier'];
-
-                    $order->save();
-                }
-
                 foreach($orders as $order) {
                     if ($order->click_and_drop_id) continue;
 
