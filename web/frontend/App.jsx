@@ -35,7 +35,11 @@ export default function App() {
                 {
                     label: "Settings",
                     destination: '/settings'
-                }
+                },
+                {
+                  label: "Product Lead Times",
+                  destination: '/product-lead-times'
+              }
               ]}
             />
             <Routes pages={pages} />

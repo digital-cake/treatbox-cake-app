@@ -16,7 +16,8 @@ import {
 import {
     ShipmentMajor,
     OrdersMajor,
-    ToolsMajor
+    ToolsMajor,
+    CalendarMajor
 } from '@shopify/polaris-icons';
 
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -58,6 +59,17 @@ export default function HomePage() {
             description: 'Configure services and API access',
             icon: (
                 <Icon source={ToolsMajor}
+                    tone="base"
+                />
+            )
+        },
+        {
+            id: 'product_lead_times',
+            url: '/product-lead-times',
+            name: "Product Lead Times",
+            description: 'Configure global and individual product lead times',
+            icon: (
+                <Icon source={CalendarMajor}
                     tone="base"
                 />
             )
