@@ -29,7 +29,7 @@ export default function ProductLeadTimeOverrideModal({setShowProductTagOverrideM
             <Modal.Section>
                 <FormLayout gap="5" inlineAlign="start">
 
-                        <TextField label="Product Tag" disabled autoComplete="off" value={`lead_time_override_${overrideCutOff}_${overrideLeadTime}_${overridePostCutoffLeadTime}`} />
+                        <TextField label="Product tag" disabled autoComplete="off" value={`lead_time_override_${overrideLeadTime}_${overrideCutOff}_${overridePostCutoffLeadTime}`} />
 
                         <DaySelect 
                             label="Lead time"

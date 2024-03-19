@@ -18,6 +18,7 @@ class VerifyCsrfToken extends Middleware
         'api/active-carrier-service',
         'api/shipping-rates/*',
         'api/carrier-service/callback',
-        'api/cart-transform/*'
+        'api/cart-transform/*',
+        'api/product-lead-times/*'
     ];
 }

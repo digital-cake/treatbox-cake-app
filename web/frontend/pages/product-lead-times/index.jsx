@@ -63,20 +63,162 @@ const dayOfWeekTabs = [
 
 export default function ProductLeadTimes() {
     const [tabIndex, setTabIndex] = useState(0);
-
-    const [defaultCutOff, setDefaultCutOff] = useState('15:00');
-    const [defaultLeadTime, setDefaultLeadTime] = useState('1');
-    const [defaultPostCutoffLeadTime, setDefaultPostCutoffLeadTime] = useState('1');
+    const [saving, setSaving] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [loading, setLoading] = useState(true);
+    const app = useAppBridge();
+    const [toasts, setToasts] = useState([]);
 
     const [showProductTagOverrideModal, setShowProductTagOverrideModal] = useState(false);
 
+    const [leadTimes, setLeadTimes] = useState([
+        {
+            'day_index': 0,
+            'lead_time': 1,
+            'cut_off_time': '15:00',
+            'post_cut_off_lead_time': 1,
+            'tag': null,
+        },
+        {
+            'day_index': 1,
+            'lead_time': 1,
+            'cut_off_time': '15:00',
+            'post_cut_off_lead_time': 1,
+            'tag': null,
+        },
+        {
+            'day_index': 2,
+            'lead_time': 1,
+            'cut_off_time': '15:00',
+            'post_cut_off_lead_time': 1,
+            'tag': null,
+        },
+        {
+            'day_index': 3,
+            'lead_time': 1,
+            'cut_off_time': '15:00',
+            'post_cut_off_lead_time': 1,
+            'tag': null,
+        },
+        {
+            'day_index': 4,
+            'lead_time': 1,
+            'cut_off_time': '15:00',
+            'post_cut_off_lead_time': 1,
+            'tag': null,
+        },
+        {
+            'day_index': 5,
+            'lead_time': 1,
+            'cut_off_time': '12:00',
+            'post_cut_off_lead_time': 3,
+            'tag': null,
+        },
+        {
+            'day_index': 6,
+            'lead_time': 1,
+            'cut_off_time': '12:00',
+            'post_cut_off_lead_time': 2,
+            'tag': null,
+        }
+    ]);
+
+    useEffect(() => {
+        (async () => {
+
+            const token = await getSessionToken(app);
+
+            let response = null;
+
+            try {
+                response = await fetch(`/api/product-lead-times/list`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-type': 'application/json'
+                    }
+                });
+
+                response = await response.json();
+
+                if (response.server_error) {
+                    //displayToast(response.server_error, true);
+                    return;
+                }
+
+                let incomingLeadTimes = [ ...leadTimes ];
+
+                for (let i = 0; i < 7; i++) {
+                    if (!response.product_lead_times[i]) continue;
+                    
+                    incomingLeadTimes[i] = response.product_lead_times[i];
+                }
+
+                setLeadTimes(incomingLeadTimes);
+
+            } catch(err) {
+                //displayToast("Server error", true);
+                console.log(err);
+            } finally {
+                setLoading(false);
+            }
+        })();
+
+    }, []);
+
+    function setLeadTimeProp(index, key, value) {
+        const newLeadTimes = [ ...leadTimes ];
+        newLeadTimes[index][key] = value;
+        setLeadTimes(newLeadTimes);
+
+        console.log(leadTimes);
+    }
+
+    function displayToast(content, error) {
+        setToasts(toasts => [ ...toasts, { content, error } ]);
+    }
+
     function displayProductTagModal() {
         setShowProductTagOverrideModal(!showProductTagOverrideModal);
-        console.log(showProductTagOverrideModal);
+    }
+
+    const saveLeadTimes = async () => {    
+        setSaving(true);
+
+        const token = await getSessionToken(app);
+
+        let response = null;
+
+        try {
+            response = await fetch(`/api/product-lead-times/store`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ lead_times: leadTimes })
+            });
+
+            response = await response.json();
+
+            console.log('saved lead times response', response);
+
+        } catch(err) {
+            //displayToast("Server error", true);
+            console.log(err);
+        } finally {
+            setSaving(false);
+        }
     }
 
     return (
-        <Page primaryAction={{ content: 'Save' }}>
+        <Page 
+            primaryAction={{
+                content: 'Save',
+                loading: saving,
+                onAction: saveLeadTimes
+            }}
+        >
            <LegacyCard>
                 <Tabs tabs={dayOfWeekTabs}
                 selected={tabIndex}
@@ -86,25 +228,25 @@ export default function ProductLeadTimes() {
 
                     <LegacyCard.Section>
                         <FormLayout gap="5" inlineAlign="start">
-                            <Text variant="headingMd">{dayOfWeekTabs[tabIndex].content} product lead times</Text>
+                            <Text variant="headingMd">{dayOfWeekTabs[tabIndex].content} product lead time</Text>
                                 <DaySelect 
                                     label="Lead time"
-                                    value={defaultLeadTime}
-                                    onChange={(value) => setDefaultLeadTime(value)} 
+                                    value={leadTimes[tabIndex].lead_time}
+                                    onChange={(value) => setLeadTimeProp(tabIndex, 'lead_time', value)} 
                                 />
 
                                 <TimeSelect 
                                     intervalMins={30} 
                                     label="Cut-off time"
-                                    value={defaultCutOff}
-                                    onChange={(value) => setDefaultCutOff(value)} 
+                                    value={leadTimes[tabIndex].cut_off_time}
+                                    onChange={(value) => setLeadTimeProp(tabIndex, 'cut_off_time', value)} 
                                 />
 
                                 <DaySelect 
                                     label="Post cut-off lead time"
-                                    value={defaultPostCutoffLeadTime}
-                                    onChange={(value) => setDefaultPostCutoffLeadTime(value)} 
-                                />          
+                                    value={leadTimes[tabIndex].post_cut_off_lead_time}
+                                    onChange={(value) => setLeadTimeProp(tabIndex, 'post_cut_off_lead_time', value)} 
+                                />   
                         </FormLayout>
                     </LegacyCard.Section>
 
@@ -115,10 +257,24 @@ export default function ProductLeadTimes() {
                 <LegacyCard.Section> 
                     <FormLayout gap="5" inlineAlign="start">
                         <Text variant="headingMd">Product tag lead time overrides</Text>
+                        <Text variant="bodyMd">Copy generated tag and add to products you wish to use the lead time on</Text>
 
                         { /* RESOURCE LIST HERE OF OVERRIDES */}
 
                         <Button onClick={displayProductTagModal} variant="primary">Add Override</Button>     
+                    </FormLayout>
+                </LegacyCard.Section>
+            </LegacyCard>
+
+            <LegacyCard>
+                <LegacyCard.Section> 
+                    <FormLayout gap="5" inlineAlign="start">
+                        <Text variant="headingMd">Blackout date overrides</Text>
+                        <Text variant="bodyMd">Applies to all products</Text>
+
+                        { /* RESOURCE LIST HERE OF BLACKOUT OVERRIDES */}
+
+                        <Button  variant="primary">Add blackout date</Button>     
                     </FormLayout>
                 </LegacyCard.Section>
             </LegacyCard>

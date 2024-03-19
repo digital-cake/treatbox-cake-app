@@ -24,6 +24,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShippingRateController;
 use App\Http\Controllers\ShopifyCarrierServiceCallbackController;
 use App\Http\Controllers\ShopifyCartTransformController;
+use App\Http\Controllers\ProductLeadTimeController;
 use Illuminate\Support\Facades\Artisan;
 use App\Console\Commands\SetAppHostMetafield;
 
@@ -180,6 +181,11 @@ Route::controller(ShopifyCartTransformController::class)->group(function() {
 
 Route::controller(OrderController::class)->group(function() {
     Route::get('/api/orders', 'list');
+});
+
+Route::controller(ProductLeadTimeController::class)->group(function() {
+    Route::get('/api/product-lead-times/list', 'list');
+    Route::post('/api/product-lead-times/store', 'store');
 });
 
 Route::post('/api/webhooks', function (Request $request) {

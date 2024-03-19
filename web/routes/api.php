@@ -44,4 +44,3 @@ Route::controller(ByobController::class)->group(function() {
     Route::options('/byob/save', 'preflight');
     Route::options('/byob/delete', 'preflight');
 });
-
