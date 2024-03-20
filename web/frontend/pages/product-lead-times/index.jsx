@@ -15,11 +15,16 @@ import {
     Tooltip,
     Label,
     Icon,
-    Button
+    Button,
+    AlphaCard,
+    ResourceList, 
+    ResourceItem,
+    Spinner,
+    HorizontalStack
 } from "@shopify/polaris";
 
 import {
-    QuestionMarkMajor
+    PackageMajor
 } from '@shopify/polaris-icons';
 
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -69,7 +74,7 @@ export default function ProductLeadTimes() {
     const app = useAppBridge();
     const [toasts, setToasts] = useState([]);
 
-    const [showProductTagOverrideModal, setShowProductTagOverrideModal] = useState(false);
+    const [leadTimeOverrides, setLeadTimeOverrides] = useState([]);
 
     const [leadTimes, setLeadTimes] = useState([
         {
@@ -77,61 +82,56 @@ export default function ProductLeadTimes() {
             'lead_time': 1,
             'cut_off_time': '15:00',
             'post_cut_off_lead_time': 1,
-            'tag': null,
         },
         {
             'day_index': 1,
             'lead_time': 1,
             'cut_off_time': '15:00',
             'post_cut_off_lead_time': 1,
-            'tag': null,
         },
         {
             'day_index': 2,
             'lead_time': 1,
             'cut_off_time': '15:00',
             'post_cut_off_lead_time': 1,
-            'tag': null,
         },
         {
             'day_index': 3,
             'lead_time': 1,
             'cut_off_time': '15:00',
             'post_cut_off_lead_time': 1,
-            'tag': null,
         },
         {
             'day_index': 4,
             'lead_time': 1,
             'cut_off_time': '15:00',
             'post_cut_off_lead_time': 1,
-            'tag': null,
         },
         {
             'day_index': 5,
             'lead_time': 1,
             'cut_off_time': '12:00',
             'post_cut_off_lead_time': 3,
-            'tag': null,
         },
         {
             'day_index': 6,
             'lead_time': 1,
             'cut_off_time': '12:00',
             'post_cut_off_lead_time': 2,
-            'tag': null,
         }
     ]);
 
     useEffect(() => {
+
         (async () => {
 
             const token = await getSessionToken(app);
 
-            let response = null;
+            //Default list
+            let productLeadTimeResponse = null;
 
             try {
-                response = await fetch(`/api/product-lead-times/list`, {
+                productLeadTimeResponse = await fetch(`/api/product-lead-times/list`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -139,9 +139,9 @@ export default function ProductLeadTimes() {
                     }
                 });
 
-                response = await response.json();
+                productLeadTimeResponse = await productLeadTimeResponse.json();
 
-                if (response.server_error) {
+                if (productLeadTimeResponse.server_error) {
                     //displayToast(response.server_error, true);
                     return;
                 }
@@ -149,9 +149,9 @@ export default function ProductLeadTimes() {
                 let incomingLeadTimes = [ ...leadTimes ];
 
                 for (let i = 0; i < 7; i++) {
-                    if (!response.product_lead_times[i]) continue;
+                    if (!productLeadTimeResponse.default_product_lead_times[i]) continue;
                     
-                    incomingLeadTimes[i] = response.product_lead_times[i];
+                    incomingLeadTimes[i] = productLeadTimeResponse.default_product_lead_times[i];
                 }
 
                 setLeadTimes(incomingLeadTimes);
@@ -162,6 +162,39 @@ export default function ProductLeadTimes() {
             } finally {
                 setLoading(false);
             }
+
+            //Overrides list
+            let productLeadTimeOverridesResponse = null;
+
+            try {
+                productLeadTimeOverridesResponse = await fetch(`/api/product-lead-times-overrides/list`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-type': 'application/json'
+                    }
+                });
+
+                productLeadTimeOverridesResponse = await productLeadTimeOverridesResponse.json();
+
+                console.log('productLeadTimeOverridesResponse', productLeadTimeOverridesResponse);
+
+                if (productLeadTimeOverridesResponse.server_error) {
+                    //displayToast(response.server_error, true);
+                    return;
+                }
+
+                if (productLeadTimeOverridesResponse) {
+                    setLeadTimeOverrides(productLeadTimeOverridesResponse.product_lead_time_overrides);
+                }
+
+            } catch(err) {
+                //displayToast("Server error", true);
+                console.log(err);
+            } finally {
+                setLoading(false);
+            }
+
         })();
 
     }, []);
@@ -176,10 +209,6 @@ export default function ProductLeadTimes() {
 
     function displayToast(content, error) {
         setToasts(toasts => [ ...toasts, { content, error } ]);
-    }
-
-    function displayProductTagModal() {
-        setShowProductTagOverrideModal(!showProductTagOverrideModal);
     }
 
     const saveLeadTimes = async () => {    
@@ -231,7 +260,7 @@ export default function ProductLeadTimes() {
                             <Text variant="headingMd">{dayOfWeekTabs[tabIndex].content} product lead time</Text>
                                 <DaySelect 
                                     label="Lead time"
-                                    value={leadTimes[tabIndex].lead_time}
+                                    value={leadTimes[tabIndex].lead_time.toString()}
                                     onChange={(value) => setLeadTimeProp(tabIndex, 'lead_time', value)} 
                                 />
 
@@ -244,7 +273,7 @@ export default function ProductLeadTimes() {
 
                                 <DaySelect 
                                     label="Post cut-off lead time"
-                                    value={leadTimes[tabIndex].post_cut_off_lead_time}
+                                    value={leadTimes[tabIndex].post_cut_off_lead_time.toString()}
                                     onChange={(value) => setLeadTimeProp(tabIndex, 'post_cut_off_lead_time', value)} 
                                 />   
                         </FormLayout>
@@ -259,30 +288,56 @@ export default function ProductLeadTimes() {
                         <Text variant="headingMd">Product tag lead time overrides</Text>
                         <Text variant="bodyMd">Copy generated tag and add to products you wish to use the lead time on</Text>
 
-                        { /* RESOURCE LIST HERE OF OVERRIDES */}
+                        <Layout>
+                            <Layout.Section>
+                                {
+                                    loading ? (
+                                        <AlphaCard>
+                                            <div className="card-loader-wrapper">
+                                                <Spinner />
+                                            </div>
+                                        </AlphaCard>
+                                    ) : (
+                                        <AlphaCard padding={0}>
+                                            <ResourceList
+                                                resourceName={{singular: 'Lead time override', plural: 'lead time overrides'}}
+                                                items={leadTimeOverrides}
+                                                renderItem={(item) => (
+                                                    <ResourceItem id={item.id}
+                                                        url={`/product-lead-times/${item.id}`}
+                                                        accessibilityLabel={`Edit ${item.title}`}
+                                                        media={<Icon
+                                                            source={PackageMajor}
+                                                            tone="base"
+                                                        />}
+                                                    >
+                                                        <VerticalStack gap="1">
+                                                            <Text variant="bodyMd"
+                                                                fontWeight="bold"
+                                                                as="h3">
+                                                                {item.title}
+                                                            </Text>
+                                                            <HorizontalStack align="space-between" gap="3">
+                                                            <Text variant="bodyMd">
+                                                                Tag: {item.tag}
+                                                            </Text>
+                                                            </HorizontalStack>
 
-                        <Button onClick={displayProductTagModal} variant="primary">Add Override</Button>     
+                                                        </VerticalStack>
+
+                                                    </ResourceItem>
+                                                )}
+                                            />
+                                        </AlphaCard>
+                                    )
+                                }
+                            </Layout.Section>
+                        </Layout>
+
+                        <Button url="/product-lead-times/new">Add override</Button>
                     </FormLayout>
                 </LegacyCard.Section>
             </LegacyCard>
-
-            <LegacyCard>
-                <LegacyCard.Section> 
-                    <FormLayout gap="5" inlineAlign="start">
-                        <Text variant="headingMd">Blackout date overrides</Text>
-                        <Text variant="bodyMd">Applies to all products</Text>
-
-                        { /* RESOURCE LIST HERE OF BLACKOUT OVERRIDES */}
-
-                        <Button  variant="primary">Add blackout date</Button>     
-                    </FormLayout>
-                </LegacyCard.Section>
-            </LegacyCard>
-
-            { showProductTagOverrideModal && 
-                <ProductLeadTimeTagOverrideModal
-                    setShowProductTagOverrideModal={setShowProductTagOverrideModal} />
-            }
         </Page>
     )
 }

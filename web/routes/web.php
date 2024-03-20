@@ -24,7 +24,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShippingRateController;
 use App\Http\Controllers\ShopifyCarrierServiceCallbackController;
 use App\Http\Controllers\ShopifyCartTransformController;
-use App\Http\Controllers\ProductLeadTimeController;
+use App\Http\Controllers\DefaultProductLeadTimeController;
+use App\Http\Controllers\ProductLeadTimeOverrideController;
 use Illuminate\Support\Facades\Artisan;
 use App\Console\Commands\SetAppHostMetafield;
 
@@ -183,9 +184,15 @@ Route::controller(OrderController::class)->group(function() {
     Route::get('/api/orders', 'list');
 });
 
-Route::controller(ProductLeadTimeController::class)->group(function() {
+Route::controller(DefaultProductLeadTimeController::class)->group(function() {
     Route::get('/api/product-lead-times/list', 'list');
     Route::post('/api/product-lead-times/store', 'store');
+});
+
+Route::controller(ProductLeadTimeOverrideController::class)->group(function() {
+    Route::get('/api/product-lead-times-overrides/list', 'list');
+    Route::get('/api/product-lead-times-overrides/{id}', 'get');
+    Route::post('/api/product-lead-times-overrides/{id}', 'store');
 });
 
 Route::post('/api/webhooks', function (Request $request) {

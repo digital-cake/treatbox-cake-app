@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ProductLeadTime;
+use App\Models\DefaultProductLeadTime;
 
-class ProductLeadTimeController extends Controller
+class DefaultProductLeadTimeController extends Controller
 {
 
     public function __construct()
@@ -18,17 +18,17 @@ class ProductLeadTimeController extends Controller
     {
         $session = $request->get('shopifySession');
 
-        $product_lead_times = ProductLeadTime::where('shop', $session->getShop())->get();
+        $default_product_lead_times = DefaultProductLeadTime::where('shop', $session->getShop())->get();
 
         $ordered_lead_times = collect([]);
 
         for ($i = 0; $i < 7; $i++) {
-            $lead_time = $product_lead_times->firstWhere('day_index', $i);
+            $lead_time = $default_product_lead_times->firstWhere('day_index', $i);
             $ordered_lead_times->push($lead_time);
         } 
 
         return [
-            'product_lead_times' => $ordered_lead_times,
+            'default_product_lead_times' => $ordered_lead_times,
         ];
     }
 
@@ -36,15 +36,15 @@ class ProductLeadTimeController extends Controller
     {
         $session = $request->get('shopifySession');
 
-        $existing_lead_times = ProductLeadTime::where('shop', $session->getShop())->get();
+        $existing_lead_times = DefaultProductLeadTime::where('shop', $session->getShop())->get();
         
         foreach($request->lead_times as $lead_time) {
            $incoming_lead_time = $existing_lead_times->first(fn ($db_lead_time) => 
-                $db_lead_time->day_index == $lead_time['day_index'] && $db_lead_time->tag == $lead_time['tag']
+                $db_lead_time->day_index == $lead_time['day_index']
             );
         
             if (!$incoming_lead_time) {
-                $incoming_lead_time = new ProductLeadTime(['shop' => $session->getShop()]);
+                $incoming_lead_time = new DefaultProductLeadTime(['shop' => $session->getShop()]);
             }
         
             $incoming_lead_time->fill($lead_time);
@@ -53,7 +53,12 @@ class ProductLeadTimeController extends Controller
         }
 
         return [
-            'success' => 'Lead times updated',
+            'success' => 'Default lead times updated',
         ];
+    }
+
+    public function checkDefaultProductLeadTimesAgainstTag(Request $request)
+    {
+        dd('tags from product', $request);
     }
 }

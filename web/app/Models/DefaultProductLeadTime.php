@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductLeadTime extends Model
+class DefaultProductLeadTime extends Model
 {
     use HasFactory;
 
@@ -16,7 +16,6 @@ class ProductLeadTime extends Model
         'lead_time',
         'cut_off_time',
         'post_cut_off_lead_time',
-        'tag',
         'shop'
     ];
 }
