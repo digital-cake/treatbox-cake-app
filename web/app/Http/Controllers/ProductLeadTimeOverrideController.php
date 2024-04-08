@@ -51,18 +51,37 @@ class ProductLeadTimeOverrideController extends Controller
             $overrides->tag = $validated['overrides']['tag'];
             $overrides->title = $validated['overrides']['title'];
             $overrides->save();
-            
-            //create associated entity
-            $overrides_weekdays = new ProductLeadTimeOverrideWeekday;
-            //assign values here
-            //$overrides_weekdays
+
+            if ($overrides) {
+                foreach ($validated['overrides']['lead_times'] as $lead_time) {
+                    $overrides_weekdays = new ProductLeadTimeOverrideWeekday;
+
+                    $overrides_weekdays->override_id = $overrides->id;
+                    $overrides_weekdays->fill($lead_time);
+                    $overrides_weekdays->save();
+                }
+            }
         } else {
-            //get associated table rows here
             $overrides = ProductLeadTimeOverride::where('id', $id)
                             ->where('shop', $session->getShop())
-                            ->whereHas('product_lead_time_override_weekdays', function($query) use($overrides){
-                                $query->where('override_id', '==', $overrides->id);
-                            })->get();
+                            ->first();             
+
+            $overrides->tag = $validated['overrides']['tag'];
+            $overrides->title = $validated['overrides']['title'];
+            $overrides->save();  
+
+            $existing_overrides = ProductLeadTimeOverrideWeekday::where('override_id', $id)->get();
+            
+            if ($overrides) {
+                foreach ($validated['overrides']['lead_times'] as $lead_time) {
+                    $incoming_lead_time = $existing_overrides->first(fn ($db_lead_time) => 
+                        $db_lead_time->day_index == $lead_time['day_index']
+                    );
+
+                    $incoming_lead_time->fill($lead_time);
+                    $incoming_lead_time->save();
+                }
+            }
         }
 
         if (!$overrides) {
@@ -80,15 +99,10 @@ class ProductLeadTimeOverrideController extends Controller
     {
         $session = $request->get('shopifySession');
 
-        $override = ProductLeadTimeOverride::where('shop', $session->getShop())
-                                                    ->where('id', $id)
-                                                    ->first();
-
-        //query other table to get associated lead time weekdays, where id == override_id
-        //need to setup one to many relationship
-        //query builder
-
-
+        $override = ProductLeadTimeOverride::where('id', $id)
+                        ->where('shop', $session->getShop())
+                        ->with('leadTimes')
+                        ->get();
 
         if (!$override) {
             return response([
@@ -100,6 +114,34 @@ class ProductLeadTimeOverrideController extends Controller
         return response([
             'override' => $override
         ], 200);
+    }
+
+    public function delete(int $id, Request $request)
+    {
+        $session = $request->get('shopifySession');
+
+        $override = ProductLeadTimeOverride::where('id', $id)
+            ->where('shop', $session->getShop())
+            ->first();
+
+        $weekdays = ProductLeadTimeOverrideWeekday::where('override_id', $id)
+            ->get(); 
+
+        if (!$override) {
+            return response([
+                'server_error' => "ProductLeadTimeOverride #{$id} not found"
+            ], 404);
+        }
+
+        $delete_id = $override->id;
+
+        foreach ($weekdays as $weekday) {
+            $weekday->delete();
+        }
+
+        $override->delete();
+
+        return ['deleted' => $delete_id];
     }
 
 }

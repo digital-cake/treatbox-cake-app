@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductLeadTimeOverride extends Model
 {
@@ -19,8 +20,8 @@ class ProductLeadTimeOverride extends Model
         'updated_at'
     ];
 
-    public function productLeadTimeOverrideWeekdays()
+    public function leadTimes(): hasMany
     {
-        return $this->hasMany(ProductLeadTimeOverrideWeekday::class);
+        return $this->hasMany(ProductLeadTimeOverrideWeekday::class, 'override_id');
     }
 }

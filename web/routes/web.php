@@ -193,6 +193,7 @@ Route::controller(ProductLeadTimeOverrideController::class)->group(function() {
     Route::get('/api/product-lead-times-overrides/list', 'list');
     Route::get('/api/product-lead-times-overrides/{id}', 'get');
     Route::post('/api/product-lead-times-overrides/{id}', 'store');
+    Route::delete('/api/product-lead-times-overrides/{id}', 'delete');
 });
 
 Route::post('/api/webhooks', function (Request $request) {

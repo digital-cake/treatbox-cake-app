@@ -13,7 +13,6 @@ class DefaultProductLeadTimeController extends Controller
         $this->middleware('shopify.auth');
     }
 
-
     public function list(Request $request)
     {
         $session = $request->get('shopifySession');
@@ -55,10 +54,5 @@ class DefaultProductLeadTimeController extends Controller
         return [
             'success' => 'Default lead times updated',
         ];
-    }
-
-    public function checkDefaultProductLeadTimesAgainstTag(Request $request)
-    {
-        dd('tags from product', $request);
     }
 }

@@ -14,7 +14,9 @@ import {
     Text,
     TextField,
     SkeletonDisplayText,
-    SkeletonTabs
+    SkeletonTabs,
+    Layout,
+    Button
 } from "@shopify/polaris";
 
 import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
@@ -155,9 +157,10 @@ export default function ProductLeadTime() {
                     return;
                 }
 
-                console.log('specific tag response', response.override);
+                console.log('specific tag response', response.override[0]);
 
-                //setOverride(response.override);
+                //alter this to set override with all data
+                setOverride(response.override[0]);
 
             } catch(err) {
                 displayToast("Server error", true);
@@ -209,11 +212,15 @@ export default function ProductLeadTime() {
                 return;
             }
 
-            setOverride(response.product_lead_times_override);
+            console.log('RESPONSEEEE', response.product_lead_times_overrides);
+
+            setOverride(response.product_lead_times_overrides);
+
+            //fix navigate here after creating new tag
 
             if (id == 'new') {
-                navigate(`/product-lead-times/${response.product_lead_times_override.id}`, { replace: true });
-                setId(response.product_lead_times_override.id);
+                navigate(`/product-lead-times/${response.product_lead_times_overrides.id}`, { replace: true });
+                setId(response.product_lead_times_overrides.id);
                 displayToast(`Product lead time overrides created successfully`);
             } else {
                 displayToast(`Product lead time overrides updated successfully`);
@@ -235,7 +242,7 @@ export default function ProductLeadTime() {
         let response = null;
 
         try {
-            response = await fetch(`/api/product-lead-times/${id}`, {
+            response = await fetch(`/api/product-lead-times-overrides/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -243,7 +250,7 @@ export default function ProductLeadTime() {
                 }
             });
         } catch(err) {
-            displayToast("Server error", true);
+            //displayToast("Server error", true);
             console.log(err);
         } finally {
             setDeleting(false);
@@ -269,6 +276,7 @@ export default function ProductLeadTime() {
         return (
             <SkeletonPage 
                 primaryAction
+                secondaryAction
                 backAction
                 narrowWidth>
                     <LegacyCard>
@@ -331,7 +339,7 @@ export default function ProductLeadTime() {
 
                                     <DaySelect 
                                         label="Lead time"
-                                        value={override.lead_times[tabIndex].lead_time}
+                                        value={override.lead_times[tabIndex].lead_time.toString()}
                                         onChange={(value) => setOverrideLeadTimeProp(tabIndex, 'lead_time', value)} 
                                     />
 
@@ -351,6 +359,24 @@ export default function ProductLeadTime() {
                         </LegacyCard.Section>
                     </Tabs>
                 </LegacyCard>
+
+                {
+                        id !== 'new' && (
+                            <Layout.Section>
+                                <Button destructive
+                                        plain
+                                        loading={deleting}
+                                        onClick={() => setDisplayDeleteConfirmation(true)}>Delete</Button>
+                                <DeleteConfirmationModal
+                                    resourceName="override tag"
+                                    resourceTitle={override.title}
+                                    display={displayDeleteConfirmation}
+                                    onCancel={() => setDisplayDeleteConfirmation(false)}
+                                    onConfirm={onDeleteAction}
+                                    deleting={deleting} />
+                            </Layout.Section>
+                        )
+                    }
 
             </Page>
             {

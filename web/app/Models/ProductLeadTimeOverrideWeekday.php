@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductLeadTimeOverrideWeekday extends Model
 {
@@ -19,8 +20,8 @@ class ProductLeadTimeOverrideWeekday extends Model
         'post_cut_off_lead_time'
     ];
 
-    public function productLeadTimeOverride()
+    public function productLeadTimeOverride(): BelongsTo
     {
-        return $this->belongsTo(ProductLeadTimeOverride::class);
+        return $this->belongsTo(ProductLeadTimeOverride::class, 'override_id');
     }
 }

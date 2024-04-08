@@ -154,6 +154,7 @@ export default function ProductLeadTimes() {
                     incomingLeadTimes[i] = productLeadTimeResponse.default_product_lead_times[i];
                 }
 
+                console.log('incomingLeadTimes', incomingLeadTimes);
                 setLeadTimes(incomingLeadTimes);
 
             } catch(err) {
