@@ -143,5 +143,4 @@ class ProductLeadTimeOverrideController extends Controller
 
         return ['deleted' => $delete_id];
     }
-
 }

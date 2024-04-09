@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\ShippingRate;
+use App\Models\ProductLeadTimeOverride;
 use App\Http\Controllers\Public\ByobController;
 
 /*
@@ -43,4 +44,18 @@ Route::controller(ByobController::class)->group(function() {
     Route::options('/byob/session-id', 'preflight');
     Route::options('/byob/save', 'preflight');
     Route::options('/byob/delete', 'preflight');
+});
+
+Route::post('/product-lead-times-from-tag', function (Request $request) {
+    //check if product has override tag, if has return override lead times
+    //if not return default lead times
+
+    $shop = $request->query('shop');
+
+    $override_lead_times = ProductLeadTimeOverride::where('shop', $shop)
+                         ->get();
+
+    return response([
+        'lead_times' => $override_lead_times
+    ], 200);                     
 });

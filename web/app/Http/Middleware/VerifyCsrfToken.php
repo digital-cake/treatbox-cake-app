@@ -20,6 +20,7 @@ class VerifyCsrfToken extends Middleware
         'api/carrier-service/callback',
         'api/cart-transform/*',
         'api/product-lead-times/*',
-        'api/product-lead-times-overrides/*'
+        'api/product-lead-times-overrides/*',
+        'api/product-lead-times-from-tag/*'
     ];
 }
