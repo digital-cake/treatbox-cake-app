@@ -55,6 +55,9 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
     $override_lead_times = ProductLeadTimeOverride::where('shop', $shop)
                          ->get();
 
+    //do check here against tags, if match return associated weekdays
+    //if no match return default
+
     return response([
         'lead_times' => $override_lead_times
     ], 200);                     
