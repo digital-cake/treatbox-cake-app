@@ -4,7 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\ShippingRate;
 use App\Models\ProductLeadTimeOverride;
+use App\Models\DefaultProductLeadTime;
 use App\Http\Controllers\Public\ByobController;
+use Illuminate\Support\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,15 +52,42 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
     //check if product has override tag, if has return override lead times
     //if not return default lead times
 
+    //to map day index against php date index
+    $GB_WEEK_INDEX_MAP = [6,0,1,2,3,4,5];
+
     $shop = $request->query('shop');
 
-    $override_lead_times = ProductLeadTimeOverride::where('shop', $shop)
-                         ->get();
+    $product_tags = $request->product_tags;
 
-    //do check here against tags, if match return associated weekdays
-    //if no match return default
+    $override_lead_times_tags = ProductLeadTimeOverride::where('shop', $shop)
+                            ->pluck('tag')->toArray();
 
-    return response([
-        'lead_times' => $override_lead_times
-    ], 200);                     
+    //check if product tag matches override tag
+    $matching_tag = array_intersect($product_tags, $override_lead_times_tags);
+
+    //get current day data
+    $day_start_carbon = Carbon::now('Europe/London');
+    $day_of_week_index = $GB_WEEK_INDEX_MAP[(int)$day_start_carbon->format('w')];
+
+    if (count($matching_tag) > 0) {
+        //get first element of array if multiple, can only use 1 tag to get overide lead times
+        //return current days lead times
+        $tag = reset($matching_tag);
+        $tag_lead_time_weekdays = ProductLeadTimeOverride::where('tag', $tag)
+            ->where('shop', $shop)
+            ->with('leadTimes')
+            ->first();
+
+        return response([
+            'current_day_lead_time' => $tag_lead_time_weekdays->leadTimes[$day_of_week_index]
+        ], 200);
+
+    } else {
+        //return current days lead times
+        $default_lead_time_weekdays = DefaultProductLeadTime::where('day_index', $day_of_week_index)->first();
+
+        return response([
+            'current_day_lead_time' => $default_lead_time_weekdays
+        ], 200);
+    };                 
 });
