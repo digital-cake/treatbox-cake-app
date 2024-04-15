@@ -212,11 +212,8 @@ export default function ProductLeadTime() {
                 return;
             }
 
-            console.log('RESPONSEEEE', response.product_lead_times_overrides);
-
+            console.log('response', response.product_lead_times_overrides);
             setOverride(response.product_lead_times_overrides);
-
-            //fix navigate here after creating new tag
 
             if (id == 'new') {
                 navigate(`/product-lead-times/${response.product_lead_times_overrides.id}`, { replace: true });
@@ -225,6 +222,7 @@ export default function ProductLeadTime() {
             } else {
                 displayToast(`Product lead time overrides updated successfully`);
             }
+            
 
         } catch(err) {
             displayToast(`Server Error: ${err.message}`, true);
@@ -262,14 +260,14 @@ export default function ProductLeadTime() {
         let newOverride = { ...override };
         newOverride.lead_times[index][key] = value;
         setOverride(newOverride);
-        console.log(newOverride);
+        //console.log(newOverride);
     }
 
     function setOverrideProp(key, value) {
         let newOverride = { ...override };
         newOverride[key] = value;
         setOverride(newOverride);
-        console.log(newOverride);
+        //console.log(newOverride);
     }
 
     if (loading) {

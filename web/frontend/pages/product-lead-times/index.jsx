@@ -142,7 +142,7 @@ export default function ProductLeadTimes() {
                 productLeadTimeResponse = await productLeadTimeResponse.json();
 
                 if (productLeadTimeResponse.server_error) {
-                    //displayToast(response.server_error, true);
+                    displayToast(response.server_error, true);
                     return;
                 }
 
@@ -158,7 +158,7 @@ export default function ProductLeadTimes() {
                 setLeadTimes(incomingLeadTimes);
 
             } catch(err) {
-                //displayToast("Server error", true);
+                displayToast("Server error", true);
                 console.log(err);
             } finally {
                 setLoading(false);
@@ -181,7 +181,7 @@ export default function ProductLeadTimes() {
                 console.log('productLeadTimeOverridesResponse', productLeadTimeOverridesResponse);
 
                 if (productLeadTimeOverridesResponse.server_error) {
-                    //displayToast(response.server_error, true);
+                    displayToast(response.server_error, true);
                     return;
                 }
 
@@ -190,7 +190,7 @@ export default function ProductLeadTimes() {
                 }
 
             } catch(err) {
-                //displayToast("Server error", true);
+                displayToast("Server error", true);
                 console.log(err);
             } finally {
                 setLoading(false);
@@ -232,9 +232,10 @@ export default function ProductLeadTimes() {
             response = await response.json();
 
             console.log('saved lead times response', response);
+            displayToast('Lead time updated successfully');
 
         } catch(err) {
-            //displayToast("Server error", true);
+            displayToast("Server error", true);
             console.log(err);
         } finally {
             setSaving(false);

@@ -90,8 +90,10 @@ class ProductLeadTimeOverrideController extends Controller
             ], 404);
         }
 
+        $response = $overrides->with('leadTimes')->get();
+
         return response([
-            'product_lead_times_overrides' => $overrides
+            'product_lead_times_overrides' => $response[0]
         ], 200);
     }
 
