@@ -90,4 +90,4 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
             'current_day_lead_time' => $default_lead_time_weekdays
         ], 200);
     };                 
-});
+})->middleware('cors');
