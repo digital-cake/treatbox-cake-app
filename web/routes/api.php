@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
 |
 */
 
+
 Route::get('/', function () {
     return "Hello API";
 });
@@ -61,6 +62,10 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
 
     $override_lead_times_tags = ProductLeadTimeOverride::where('shop', $shop)
                             ->pluck('tag')->toArray();
+    
+    if (!$product_tags) {
+        $product_tags = [];
+    }
 
     //check if product tag matches override tag
     $matching_tag = array_intersect($product_tags, $override_lead_times_tags);
@@ -90,4 +95,4 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
             'current_day_lead_time' => $default_lead_time_weekdays
         ], 200);
     };                 
-})->middleware('cors');
+});
