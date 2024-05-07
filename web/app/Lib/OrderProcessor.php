@@ -201,16 +201,11 @@ class OrderProcessor
             }
 
             if (!$custom_identifier) {
-                //Handle legacy box properties
-                $box_bool_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box' && $prop['value'] == 'true');
+                $box_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box_id');
 
-                if (!$box_bool_prop) continue;
+                if ($box_id_prop) continue;
 
-                $id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box_id');
-
-                if (!$id_prop) continue;
-
-                $custom_identifier = $id_prop['value'];
+                $custom_identifier = (string)Str::uuid();
             }
 
             $line_item = [
