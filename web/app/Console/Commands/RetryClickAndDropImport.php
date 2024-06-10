@@ -48,7 +48,7 @@ class RetryClickAndDropImport extends Command
 
         $sessions = Session::all();
 
-        $twenty_minutes_ago = Carbon::now()->subMinutes(20)->format('Y-m-d H:i:s');
+        $twenty_minutes_ago = Carbon::now('Europe/London')->subMinutes(20)->format('Y-m-d H:i:s');
 
         foreach ($sessions as $session) {
 
@@ -58,13 +58,11 @@ class RetryClickAndDropImport extends Command
 
             if (!$click_and_drop_api_key) continue;
 
-            $click_and_drop = new ClickAndDropService($click_and_drop_api_key);
-
             Order::whereNull('click_and_drop_id')
             ->where('created_at', '<', $twenty_minutes_ago)
             ->where('shop', $session->shop)
             ->with('items')
-            ->chunk(100, function($orders) use ($click_and_drop) {
+            ->chunk(100, function($orders) {
 
                 foreach($orders as $order) {
                     if ($order->click_and_drop_id) continue;
