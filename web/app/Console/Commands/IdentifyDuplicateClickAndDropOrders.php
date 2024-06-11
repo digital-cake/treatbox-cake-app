@@ -6,8 +6,10 @@ use Illuminate\Console\Command;
 
 use App\Models\Session;
 use App\Models\SettingOption;
+use App\Models\Order;
 use App\Services\ClickAndDropService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class IdentifyDuplicateClickAndDropOrders extends Command
 {
@@ -62,7 +64,7 @@ class IdentifyDuplicateClickAndDropOrders extends Command
 
             $this->info("Fetching orders from the last {$days} days...");
 
-            $days_ago = Carbon::today()->subDays($days)->toISOString();
+            $days_ago = Carbon::today('Europe/London')->subDays($days)->toISOString();
 
             $channel_ref_orders = [];
 
@@ -101,6 +103,10 @@ class IdentifyDuplicateClickAndDropOrders extends Command
 
             $count = 0;
 
+            $db_orders = Order::where('shop', $session->shop)
+                        ->where('created_at', '>', $days_ago)
+                        ->get();
+
             foreach($channel_ref_orders as $channel_ref => $orders) {
                 $order_count = count($orders);
 
@@ -108,9 +114,24 @@ class IdentifyDuplicateClickAndDropOrders extends Command
 
                 $count++;
 
+                $found_db_order = null;
+
+                foreach($orders as $order_click_and_drop_id) {
+                    $found_db_order = $db_orders->firstWhere('click_and_drop_id', $order_click_and_drop_id);
+
+                    if ($found_db_order) break;
+                }
+
                 $cs_order_ids = implode(", ", $orders);
 
                 $this->info("{$count}: Order {$channel_ref} has {$order_count} channel shipper orders: {$cs_order_ids}");
+
+                Log::channel('slack')->error("{$count}: Order {$channel_ref} has {$order_count} channel shipper orders: {$cs_order_ids}", [
+                    'additional data' => [
+                        'db_click_and_drop_id' => $found_db_order ? $found_db_order->click_and_drop_id : null
+                    ]
+                ]);
+
 
             }
 
