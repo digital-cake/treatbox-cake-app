@@ -25,7 +25,7 @@ class ClickAndDropService
             'Authorization' => "Bearer {$this->auth_token}"
         ]);
 
-        $client->withOptions(["verify"=>false]);
+        // $client->withOptions(["verify"=>false]);
 
         $response = null;
 
