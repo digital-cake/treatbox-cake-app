@@ -1,0 +1,23 @@
+query Input {
+    cart {
+        lines {
+            boxIdAttr: attribute(key: "_box_id") {
+                value
+            }
+            idAttr: attribute(key: "_id") {
+                value
+            }
+            merchandise {
+                __typename
+                ... on ProductVariant {
+                    product {
+                        inCollections(ids: ["gid://shopify/Collection/33489125493", "gid://shopify/Collection/469025456447"]) {
+                            collectionId
+                            isMember
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

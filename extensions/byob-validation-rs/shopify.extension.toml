@@ -1,0 +1,19 @@
+api_version = "2024-07"
+
+[[extensions]]
+name = "t:name"
+handle = "byob-validation-rs"
+type = "function"
+
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "purchase.validation.run"
+  input_query = "src/run.graphql"
+  export = "run"
+
+  [extensions.build]
+  command = "cargo wasi build --release"
+  path = "target/wasm32-wasi/release/byob-validation-rs.wasm"
+  watch = [ "src/**/*.rs" ]
+
