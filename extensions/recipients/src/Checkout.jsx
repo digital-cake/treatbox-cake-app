@@ -14,7 +14,8 @@ import {
   SkeletonTextBlock,
   Divider,
   Link,
-  InlineLayout
+  InlineLayout,
+  useAppMetafields
 } from "@shopify/ui-extensions-react/checkout";
 
 import { useEffect, useState } from "react";
@@ -23,8 +24,6 @@ import { useEffect, useState } from "react";
 export default reactExtension("purchase.checkout.block.render", () => (
   <Extension />
 ));
-
-const CAKE_APP_BASE_URL = "https://927ba0c7687f.ngrok.app";
 
 const nth = (d) => {
     if (d > 3 && d < 21) return 'th';
@@ -81,6 +80,8 @@ function Extension() {
         lines,
         shop
     } = useApi();
+
+    const appMetafields = useAppMetafields();
 
     const [shipments, setShipments] = useState(null);
     const [someItemsHaveNoShippingAddress, setSomeItemsHaveNoShippingAddress] = useState(false);
@@ -174,7 +175,11 @@ function Extension() {
 
         const shipmentIds = Object.keys(shipmentsIdMap);
 
-        fetch(`${CAKE_APP_BASE_URL}/public/api/shipments/lookup?shipment_ids=${shipmentIds.join(',')}&shop=${shop.myshopifyDomain}&with=rate`)
+        const appHostMetafield = appMetafields.find(metafield => metafield.metafield.key == 'app_host');
+
+        if (!appHostMetafield) return;
+
+        fetch(`https://${appHostMetafield.metafield.value}/public/api/shipments/lookup?shipment_ids=${shipmentIds.join(',')}&shop=${shop.myshopifyDomain}&with=rate`)
         .then(response => response.json())
         .then(response => {
             for (const shipmentRate of response.shipments) {
@@ -188,7 +193,7 @@ function Extension() {
 
         setSomeItemsHaveNoShippingAddress(itemsWithoutAddresses.length > 0);
 
-    }, [lines, attributes, shop]);
+    }, [lines, attributes, shop, appMetafields]);
 
     if (Array.isArray(shipments) && shipments.length < 1) {
         return (

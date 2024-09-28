@@ -8,6 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Shopify\Clients\Rest;
 use App\Lib\OrderProcessor;
+use App\Lib\NewOrderProcessor;
+use Illuminate\Support\Arr;
 
 class ReconcileMissingOrders extends Command
 {
@@ -81,7 +83,14 @@ class ReconcileMissingOrders extends Command
 
                 $this->info("Order {$order['id']} doesn't exist. Processing...");
 
-                OrderProcessor::process($session->shop, $order);
+                $order_addresses_attr = Arr::first($order['note_attributes'], fn ($attr) => $attr['name'] == 'addresses', null);
+
+                if ($order_addresses_attr) {
+                    $order_addresses = json_decode($order_addresses_attr['value'], true);
+                    NewOrderProcessor::process($session->shop, $order, $order_addresses);
+                } else {
+                    OrderProcessor::process($session->shop, $order);
+                }
 
             }
 

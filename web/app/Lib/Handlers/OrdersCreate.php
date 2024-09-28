@@ -16,7 +16,7 @@ class OrdersCreate implements Handler
     {
         $order = $body;
 
-        $order_addresses_attr = Arr::first(Arr::first($order['note_attributes'], fn ($attr) => $attr['name'] == 'addresses'), null);
+        $order_addresses_attr = Arr::first($order['note_attributes'], fn ($attr) => $attr['name'] == 'addresses', null);
 
         try {
             if ($order_addresses_attr) {
