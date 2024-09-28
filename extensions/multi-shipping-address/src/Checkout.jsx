@@ -70,7 +70,7 @@ function Extension() {
     const applyCartLinesChange = useApplyCartLinesChange();
 
     useEffect(() => {
-        
+
 
         // applyAttributeChange({
         //     type: 'updateAttribute',

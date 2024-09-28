@@ -7,6 +7,7 @@ use App\Models\ProductLeadTimeOverride;
 use App\Models\DefaultProductLeadTime;
 use App\Http\Controllers\Public\ByobController;
 use App\Http\Controllers\Public\ShippingController;
+use App\Http\Controllers\Public\ShipmentController;
 use Illuminate\Support\Carbon;
 
 /*
@@ -28,6 +29,11 @@ Route::get('/', function () {
 Route::controller(ShippingController::class)->group(function() {
     Route::get('/shipping-rates', 'list');
     Route::get('/shipping/country-codes', 'listAvailableCountryCodes');
+});
+
+Route::controller(ShipmentController::class)->group(function() {
+    Route::get('/shipments/lookup', 'lookup');
+    Route::post('/shipments/save', 'save');
 });
 
 Route::controller(ByobController::class)->group(function() {

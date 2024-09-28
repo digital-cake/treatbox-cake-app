@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 use App\Models\ShippingRate;
+
 
 class ShippingController extends Controller
 {
@@ -15,9 +16,16 @@ class ShippingController extends Controller
         $shop = $request->query('shop');
         $country_code = $request->query('country');
 
-        $shipping_rates = ShippingRate::where('shop', $shop)
-                    ->where('countries', 'LIKE', "%{$country_code}%")
-                    ->get();
+        $country_codes = collect(explode(',',$country_code))->map(fn($c) => trim($c))->values()->toArray();
+
+        $shipping_rates_query = ShippingRate::where('shop', $shop)
+                    ->where(function ($query) use($country_codes) {
+                        foreach($country_codes as $c) {
+                            $query->orWhere('countries', 'LIKE', "%{$c}%");
+                        }
+                    });
+
+        $shipping_rates = $shipping_rates_query->get();
 
         return response([
             'rates' => $shipping_rates
