@@ -191,7 +191,7 @@ class NewOrderProcessor
 
             $shipment_id = $address_id_prop['value'];
 
-            $delay_prop = Arr::first($line_item['Delay'], fn ($prop) => $prop['name'] == 'Delay');
+            $delay_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == 'Delay');
             $delay_date = null;
 
             //Sometimes Shopify's checkout will change a null value of a property to a string with the value of "null"
