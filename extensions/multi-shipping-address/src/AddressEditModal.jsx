@@ -153,7 +153,7 @@ export default function AddressEditModal(props) {
     }
 
     function isLineBoxItem(line) {
-        return line.attributes.findIndex(attr => attr.key == '_box_id') !== -1;
+        return line.attributes.findIndex(attr => attr.key == '_box_id' || attr.key == '_parent_item_id') !== -1;
     }
 
     function renderLineItemAttr(line, attrName) {
@@ -319,32 +319,9 @@ export default function AddressEditModal(props) {
                                                                 renderLineItemAttr(line, 'Box Items')
                                                             }
                                                             {
-                                                                line.lineComponents && line.lineComponents.length > 0 && (
-                                                                    <>
-                                                                        <BlockSpacer />
-                                                                        <List>
-                                                                            {
-                                                                                line.lineComponents.map((componentLine, index) => {
-
-                                                                                    if (componentLine.merchandise.id == line.merchandise.id) return null;
-
-                                                                                    return (
-                                                                                        <ListItem key={`line-${line.id}-${index}`}>
-                                                                                            {componentLine.merchandise.title}
-                                                                                        </ListItem>
-                                                                                    )
-
-                                                                                })
-                                                                            }
-
-                                                                        </List>
-                                                                    </>
-
-                                                                )
+                                                                renderLineItemAttr(line, 'Extras')
                                                             }
                                                         </View>
-
-
 
                                                     </InlineStack>
 
