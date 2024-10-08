@@ -77,16 +77,18 @@ class NewOrderProcessor
                 'shipping_cost_charged' => $shipping_cost,
                 'currency_code' => $order['total_price_set']['presentment_money']['currency_code'],
                 'order_date' => Carbon::parse($order['processed_at'])->format('Y-m-d H:i:s'),
-                'selected_shipping_method' => $shipment['rate_name'],
+                'selected_shipping_method' => $shipment['rate'],
                 'recipient_name' => $shipping_address['name'],
                 'recipient_address1' => $shipping_address['address1'],
                 'recipient_address2' => $shipping_address['address2'],
                 'recipient_company' => !empty($shipping_address['company']) ? $shipping_address['company'] : null,
                 'recipient_city' => $shipping_address['city'],
-                'recipient_county' => $shipping_address['county'],
-                'recipient_postcode' => $shipping_address['postcode'],
-                'recipient_country_code' => $shipping_address['country_code']
+                'recipient_county' => $shipping_address['province'],
+                'recipient_postcode' => $shipping_address['zip'],
+                'recipient_country_code' => $shipping_address['countryCode']
             ]);
+
+            $incoming_order->fill($billing_address);
 
             $subtotal = 0;
 
@@ -129,17 +131,19 @@ class NewOrderProcessor
                     ]));
                 }
 
-                $incoming_order->fill([
-                    'subtotal' => $subtotal,
-                    'total' => $subtotal + $shipping_cost,
-                    'special_instructions' => self::extractSpecialInstructions($shipment)
-                ]);
-
-                $incoming_order->save();
-                $incoming_order->items()->saveMany($incoming_items);
-
-                ClickAndDropOrderImport::dispatch($incoming_order);
             }
+
+            $incoming_order->fill([
+                'subtotal' => $subtotal,
+                'total' => $subtotal + $shipping_cost,
+                'special_instructions' => self::extractSpecialInstructions($shipment),
+                'selected_shipping_method' => $rate_name
+            ]);
+
+            $incoming_order->save();
+            $incoming_order->items()->saveMany($incoming_items);
+
+            ClickAndDropOrderImport::dispatch($incoming_order);
 
         }
 
@@ -150,9 +154,9 @@ class NewOrderProcessor
         $shipments = [];
 
         foreach($order['line_items'] as $line_item) {
-            $box_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box_id');
+            $child_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box_id' || $prop['name'] == '_parent_item_id');
 
-            if ($box_id_prop) continue;
+            if ($child_id_prop) continue;
 
             $custom_line_item = [
                 'box' => false,
@@ -181,6 +185,24 @@ class NewOrderProcessor
 
             }
 
+            $item_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_item_id');
+
+            if ($item_id_prop && !empty($item_id_prop['value'])) {
+
+                $custom_line_item['box'] = true;
+
+                $custom_line_item['children'] = Arr::where($order['line_items'], function ($item) use($item_id_prop) {
+                    $parent_id_prop = Arr::first($item['properties'], fn ($prop) => $prop['name'] == '_parent_item_id');
+
+                    if (!$parent_id_prop) return false;
+
+                    if ($parent_id_prop['value'] != $item_id_prop['value']) return false;
+
+                    return true;
+                });
+
+            }
+
             $address_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_address_id');
 
             if (!$address_id_prop) continue;
@@ -189,13 +211,15 @@ class NewOrderProcessor
 
             if (!$address) continue;
 
+            $address['name'] = trim($address['firstName'] . ' ' . $address['lastName']);
+
             $shipment_id = $address_id_prop['value'];
 
             $delay_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == 'Delay');
             $delay_date = null;
 
             //Sometimes Shopify's checkout will change a null value of a property to a string with the value of "null"
-            if ($delay_prop && $delay_prop['value'] !== 'null') {
+            if ($delay_prop && !empty($delay_prop['value']) && $delay_prop['value'] !== 'null') {
                 $shipment_id .= "_" . $delay_prop['value'];
                 $delay_date = $delay_prop['value'];
             }
@@ -212,7 +236,7 @@ class NewOrderProcessor
         }
 
         $shipment_ids = array_keys($shipments);
-        $shipment_configurations = Shipment::where('shop', $shop)->whereIn('shipment_id', $shipments)->with('rate')->get();
+        $shipment_configurations = Shipment::where('shop', $shop)->whereIn('shipment_id', $shipment_ids)->with('rate')->get();
 
         $shipments_array = [];
 
@@ -238,7 +262,8 @@ class NewOrderProcessor
 
         if ($shipment['delay']) {
             try {
-                $special_instruction_lines['Delay'] = Carbon::createFromFormat('Y-m-d', $shipment['delay'], 'Europe/London')->format('jS M Y');
+                $delay_date_formatted = Carbon::createFromFormat('Y-m-d', $shipment['delay'], 'Europe/London')->format('jS M Y');
+                $special_instruction_lines['Delay'] = "Delay Date: {$delay_date_formatted}";
             } catch(\Exception $e) {
                 //Do nothing
             }
