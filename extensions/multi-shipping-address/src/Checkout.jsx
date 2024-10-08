@@ -70,7 +70,7 @@ function Extension() {
     const applyCartLinesChange = useApplyCartLinesChange();
 
     useEffect(() => {
-        
+
 
         // applyAttributeChange({
         //     type: 'updateAttribute',
@@ -171,7 +171,7 @@ function Extension() {
         for (let i = 0; i < cartLines.length; i++) {
             if (!cartLines[i].merchandise.requiresShipping || cartLines[i].merchandise.id == dataVariantId) continue;
 
-            const boxIdAttr = cartLines[i].attributes.find(attr => attr.key == '_box_id');
+            const boxIdAttr = cartLines[i].attributes.find(attr => attr.key == '_box_id' || attr.key == '_parent_item_id');
 
             if (boxIdAttr) continue;
 
