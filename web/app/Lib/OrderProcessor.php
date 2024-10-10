@@ -193,17 +193,21 @@ class OrderProcessor
             //Only BYOB boxes will have the "_id" property
             //BYOB box items have the "_box_id" property which should match the "_id" property of the box product
             $id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_id');
+            $item_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_item_id');
 
             if ($timestamp_prop) {
                 $custom_identifier = $timestamp_prop['value'];
             } else if ($id_prop) {
                 $custom_identifier = $id_prop['value'];
+            } else if ($item_id_prop) {
+                $custom_identifier = $item_id_prop['value'];
             }
 
             if (!$custom_identifier) {
                 $box_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_box_id');
+                $parent_id_prop = Arr::first($line_item['properties'], fn ($prop) => $prop['name'] == '_parent_item_id');
 
-                if ($box_id_prop) continue;
+                if ($box_id_prop || $parent_id_prop) continue;
 
                 $custom_identifier = (string)Str::uuid();
             }
@@ -233,6 +237,21 @@ class OrderProcessor
                     return true;
                 });
 
+            }
+
+            if ($item_id_prop) {
+
+                $line_item['box'] = true;
+
+                $line_item['children'] = Arr::where($order['line_items'], function ($item) use($item_id_prop) {
+                    $parent_id_prop = Arr::first($item['properties'], fn ($prop) => $prop['name'] == '_parent_item_id');
+
+                    if (!$parent_id_prop) return false;
+
+                    if ($parent_id_prop['value'] != $item_id_prop['value']) return false;
+
+                    return true;
+                });
             }
 
             $line_items->push($line_item);
