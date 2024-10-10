@@ -6,6 +6,8 @@ use App\Models\ShippingRate;
 use App\Models\ProductLeadTimeOverride;
 use App\Models\DefaultProductLeadTime;
 use App\Http\Controllers\Public\ByobController;
+use App\Http\Controllers\Public\ShippingController;
+use App\Http\Controllers\Public\ShipmentController;
 use Illuminate\Support\Carbon;
 
 /*
@@ -24,19 +26,14 @@ Route::get('/', function () {
     return "Hello API";
 });
 
-Route::get('/shipping-rates', function (Request $request) {
+Route::controller(ShippingController::class)->group(function() {
+    Route::get('/shipping-rates', 'list');
+    Route::get('/shipping/country-codes', 'listAvailableCountryCodes');
+});
 
-    $shop = $request->query('shop');
-    $country_code = $request->query('country');
-
-    $shipping_rates = ShippingRate::where('shop', $shop)
-                ->where('countries', 'LIKE', "%{$country_code}%")
-                ->get();
-
-    return response([
-        'rates' => $shipping_rates
-    ], 200);
-
+Route::controller(ShipmentController::class)->group(function() {
+    Route::get('/shipments/lookup', 'lookup');
+    Route::post('/shipments/save', 'save');
 });
 
 Route::controller(ByobController::class)->group(function() {
@@ -62,7 +59,7 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
 
     $override_lead_times_tags = ProductLeadTimeOverride::where('shop', $shop)
                             ->pluck('tag')->toArray();
-    
+
     if (!$product_tags) {
         $product_tags = [];
     }
@@ -94,5 +91,5 @@ Route::post('/product-lead-times-from-tag', function (Request $request) {
         return response([
             'current_day_lead_time' => $default_lead_time_weekdays
         ], 200);
-    };                 
+    };
 });

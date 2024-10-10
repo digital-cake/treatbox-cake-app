@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Shopify\Clients\HttpHeaders;
 use Illuminate\Support\Carbon;
 use App\Models\ShippingRate;
+use App\Models\Shipment;
 
 class ShopifyCarrierServiceCallbackController extends Controller
 {
@@ -26,9 +27,23 @@ class ShopifyCarrierServiceCallbackController extends Controller
 
         $line_items = isset($rate['items']) ? collect($rate['items']) : collect([]);
 
-        $shipping_data_line_item = $line_items->first(fn ($item) => $item['properties'] && !empty($item['properties']['_shipping_methods']));
+        $shipment_ids = [];
 
-        if (!$shipping_data_line_item) {
+        foreach($line_items as $line_item) {
+            if (empty($line_item['properties']['_address_id'])) continue;
+
+            $shipment_id = $line_item['properties']['_address_id'];
+
+            if (!empty($line_item['properties']['Delay'])) {
+                $shipment_id .= '_' . $line_item['properties']['Delay'];
+            }
+
+            if (!in_array($shipment_id, $shipment_ids)) {
+                $shipment_ids[] = $shipment_id;
+            }
+        }
+
+        if (count($shipment_ids) < 1) {
 
             $country_code = $rate['destination']['country'];
 
@@ -50,14 +65,19 @@ class ShopifyCarrierServiceCallbackController extends Controller
 
         }
 
-        $shipping_methods = json_decode($shipping_data_line_item['properties']['_shipping_methods'], true);
+        $shipments = Shipment::where('shop', $shop)
+                            ->whereIn('shipment_id', $shipment_ids)
+                            ->get();
 
         $selected_rates = collect([]);
 
-        foreach($shipping_methods as $addr_id => $rate_id) {
-            $rate = ShippingRate::where('id', $rate_id)->where('shop', $shop)->first();
-            if (!$rate) continue;
-            $selected_rates->push($rate);
+        foreach($shipments as $shipment) {
+            if (!$shipment->rate) continue;
+            $selected_rates->push($shipment->rate);
+        }
+
+        if ($selected_rates->count() < count($shipment_ids)) {
+            return [ 'rates' => [] ];
         }
 
         $service_name = "";

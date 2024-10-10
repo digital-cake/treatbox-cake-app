@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "0eacd3a621cac73517105bb9f7becc6a"
-name = "Treatbox Cake App - Dev"
-application_url = "https://927ba0c7687f.ngrok.app"
+client_id = "1b9798a588d1861169aee50217de0097"
+name = "Treatbox Cake App - Staging"
+application_url = "https://staging.treatboxapp.codelayer.io"
 embedded = true
 
 [build]
@@ -17,14 +17,14 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://927ba0c7687f.ngrok.app/auth/callback",
-  "https://927ba0c7687f.ngrok.app/auth/shopify/callback",
-  "https://927ba0c7687f.ngrok.app/api/auth/callback",
-  "https://927ba0c7687f.ngrok.app/.shopify/graphiql/auth/callback"
+  "https://staging.treatboxapp.codelayer.io/auth/callback",
+  "https://staging.treatboxapp.codelayer.io/auth/shopify/callback",
+  "https://staging.treatboxapp.codelayer.io/api/auth/callback",
+  "https://staging.treatboxapp.codelayer.io/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]
-api_version = "2023-10"
+api_version = "2024-07"
 
 [pos]
 embedded = false
