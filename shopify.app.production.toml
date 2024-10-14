@@ -1,9 +1,13 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "Treatbox Cake App"
 client_id = "5a6ef295ab4c215643513230e668a4e1"
+name = "Treatbox Cake App"
 application_url = "https://treatboxapp.codelayer.io"
 embedded = true
+
+[build]
+dev_store_url = "treatbox-development.myshopify.com"
+include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -23,6 +27,3 @@ api_version = "2024-01"
 
 [pos]
 embedded = false
-
-[build]
-dev_store_url = "treatbox-development.myshopify.com"
