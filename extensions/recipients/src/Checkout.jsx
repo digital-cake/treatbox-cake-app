@@ -10,6 +10,7 @@ import {
   useApplyAttributeChange,
   useInstructions,
   useBuyerJourneyIntercept,
+  useNote,
   Heading,
   SkeletonTextBlock,
   Divider,
@@ -85,9 +86,16 @@ function Extension() {
 
     const [shipments, setShipments] = useState(null);
     const [someItemsHaveNoShippingAddress, setSomeItemsHaveNoShippingAddress] = useState(true);
+    const note = useNote();
 
     useBuyerJourneyIntercept(
         ({canBlockProgress}) => {
+
+            if (note.includes("DO_NOT_VALIDATE")) {
+                return {
+                    behavior: 'allow'
+                };
+            }
 
             if (canBlockProgress && someItemsHaveNoShippingAddress && initialised) {
                 return {
@@ -202,6 +210,10 @@ function Extension() {
 
 
     }, [lines, attributes, shop, appMetafields]);
+
+    if (note.includes("DO_NOT_VALIDATE")) {
+        return null;
+    }
 
     if (Array.isArray(shipments) && shipments.length < 1) {
         return (
