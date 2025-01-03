@@ -85,19 +85,12 @@ function Extension() {
     const appMetafields = useAppMetafields();
 
     const [shipments, setShipments] = useState(null);
-    const [someItemsHaveNoShippingAddress, setSomeItemsHaveNoShippingAddress] = useState(true);
-    const note = useNote();
+    const [someItemsHaveNoShippingAddress, setSomeItemsHaveNoShippingAddress] = useState(false);
 
     useBuyerJourneyIntercept(
         ({canBlockProgress}) => {
 
-            if (note.includes("DO_NOT_VALIDATE")) {
-                return {
-                    behavior: 'allow'
-                };
-            }
-
-            if (canBlockProgress && someItemsHaveNoShippingAddress && initialised) {
+            if (canBlockProgress && someItemsHaveNoShippingAddress) {
                 return {
                     behavior: 'block',
                     reason: "Unconfigured shipping",
@@ -133,10 +126,7 @@ function Extension() {
 
         let addressesAttr = attributes.current.find(attr => attr.key == 'addresses');
 
-        if (!addressesAttr) {
-            setShipments([]);
-            return;
-        }
+        if (!addressesAttr) return;
 
         let addresses = JSON.parse(addressesAttr.value);
 
@@ -184,14 +174,7 @@ function Extension() {
             }
         }
 
-        setSomeItemsHaveNoShippingAddress(itemsWithoutAddresses.length > 0);
-
         const shipmentIds = Object.keys(shipmentsIdMap);
-
-        if (shipmentIds.length < 1) {
-            setShipments([]);
-            return;
-        }
 
         const appHostMetafield = appMetafields.find(metafield => metafield.metafield.key == 'app_host');
 
@@ -208,6 +191,8 @@ function Extension() {
             setShipments(Object.values(shipmentsIdMap));
         });
 
+
+        setSomeItemsHaveNoShippingAddress(itemsWithoutAddresses.length > 0);
 
     }, [lines, attributes, shop, appMetafields]);
 
